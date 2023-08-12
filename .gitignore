@@ -1,0 +1,17 @@
+# 构建文件
+__pycache__
+*.pyc
+build
+dist
+*.spec
+upx*
+
+# 调试文件
+/__showcase
+/img_archive
+/output
+/*.cfg
+/webData
+/data
+/*.log
+~*
