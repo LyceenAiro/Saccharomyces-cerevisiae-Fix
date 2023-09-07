@@ -1,6 +1,6 @@
 from os import mkdir, path
 from configparser import ConfigParser
-import sys,os,urllib.request
+import sys,os
 
 from xml.etree.cElementTree import parse
 
@@ -23,7 +23,7 @@ class Config:
             sys.exit(1)
 
         self.map_size, self.card_num, self.db_dir, self.game_dir, self.output, \
-        self.skin_name, self.language, self.is_init, self.version = self._read()
+        self.skin_name, self.language, self.is_init, self.version , self.web= self._read()
 
         # validity check for paths
         path_list = self.cfg.items('Directory')
@@ -115,20 +115,16 @@ class Config:
         if not web == "":
             if not os.path.exists("./webData"):
                 os.makedirs("./webData")
-            try:
-                urllib.request.urlretrieve(web, "./webData/sdvx@asphyxia.db")
-                db_dir = "./webData/sdvx@asphyxia.db"
-            except:
-                web = "error 404"
+            db_dir = "./webData/sdvx@asphyxia.db"
         else:
-            web = "None"
+            pass
 
         timber.info('config.cfg load complete.\n'
                     'map size  :%d\ncard num  :%s\ndb dir    :%s\ngame dir  :%s\noutput    :%s\n'
                     'web link  :%s\nskin name :%s\nlanguage  :%s\nis init   :%s\nversion   :%d'
                     % (map_size, card_num, db_dir, game_dir, output, web, skin_name, language, str(is_init), version))
 
-        return map_size, card_num, db_dir, game_dir, output, skin_name, language, is_init, version
+        return map_size, card_num, db_dir, game_dir, output, skin_name, language, is_init, version, web
 
     def _set_init_sign(self, set_bool: bool = True):
         self.cfg.set('Init', 'is initialized', str(set_bool))

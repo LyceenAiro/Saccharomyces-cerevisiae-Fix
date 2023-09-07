@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import time
+import urllib.request
 from traceback import format_exc
 
 # interior packages
@@ -15,7 +16,7 @@ from genre import packet
 from parse import npdb
 from parse.asp import asp
 
-VERSION = [1, 3, 1]
+VERSION = [1, 3, 2]
 
 
 class SDVX:
@@ -29,20 +30,33 @@ class SDVX:
             sys.exit(1)
 
     def _get_b50(self):
+        self.updata_WebDB()
         print(self.plot_skin.plot_b50())
         input(draft.CommonMsg.enter())
 
     def _get_summary(self, base_lv: int):
+        self.updata_WebDB()
         print(self.plot_skin.plot_summary(base_lv=base_lv))
         input(draft.CommonMsg.enter())
 
     def _get_single(self, sg_index: int):
+        self.updata_WebDB()
         print(self.plot_skin.plot_single(sg_index=sg_index))
         input(draft.CommonMsg.enter())
 
     def _get_level(self, level: int, limits: tuple, grade_flag: str):
+        self.updata_WebDB()
         print(self.plot_skin.plot_level(level=level, limits=limits, grade_flag=grade_flag))
         input(draft.CommonMsg.enter())
+
+    def updata_WebDB(self):
+        if not cfg.web == "":
+            try:
+                urllib.request.urlretrieve(cfg.web, "./webData/sdvx@asphyxia.db")
+            except:
+                print("updata web error")
+        else:
+            pass
 
     def _1_get_b50(self):
         os.system('cls')
