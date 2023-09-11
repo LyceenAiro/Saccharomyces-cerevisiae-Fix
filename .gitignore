@@ -7,6 +7,7 @@ dist
 upx*
 
 # 调试文件
+/config.yaml
 /__showcase
 /img_archive
 /output
