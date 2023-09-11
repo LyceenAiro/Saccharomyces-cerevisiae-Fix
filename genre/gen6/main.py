@@ -10,11 +10,10 @@ from matplotlib.font_manager import FontProperties
 from .tools import *
 
 from parse import npdb
-from parse.asp import asp
 from utli.logger import timber
 
 
-def plot_single(sg_index: int, _music_map: list = asp.music_map, profile: list = asp.profile) -> str:
+def plot_single(sg_index: int, _music_map: list, profile: list) -> str:
     """
     Plot function for single record
 
@@ -31,12 +30,6 @@ def plot_single(sg_index: int, _music_map: list = asp.music_map, profile: list =
     inf_ver, name = npdb.level_table[mid][9], npdb.level_table[mid][1]
     diff = get_diff(m_type, inf_ver)
     real_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(m_time / 1000))
-
-    # Get recent text message
-    msg = '|Date                 |Diff  |Score    |Grade |Clear |VF     |Name\n' \
-          '|%-21s|%-6s|%-9s|%-6s|%-6s|%-6.3f |%s' \
-          % (real_time, (diff + str(lv)), score, grade_table[grade], clear_table[clear], vf, name)
-    timber.debug('Generate single data complete.\n%s' % msg)
 
     try:
         """
@@ -319,20 +312,20 @@ def plot_single(sg_index: int, _music_map: list = asp.music_map, profile: list =
 
         text_layer = np.array(text_layer)
         png_superimpose(bg, text_layer)
-        output_path = '%s/%s_%s%s.png' % (cfg.output, validate_filename(user_name), mid, diff)
+        output_path = '%s/pr.png' % (cfg.output)
         cv2.imwrite(output_path, bg[:1560, :540, :3], params=[cv2.IMWRITE_PNG_COMPRESSION, 3])
 
         timber.info('Plot saved at [%s] successfully.' % output_path)
 
-        return msg
+        return
 
     except Exception:
         timber.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
                        % format_exc())
-        return msg
+        return
 
 
-def plot_b50(_music_map: list = asp.music_map, profile: list = asp.profile) -> str:
+def plot_b50(_music_map: list, profile: list) -> str:
     """
     Plot function for best 50 records
     :param _music_map: a list contains all music records, each line of music_map should be:
@@ -353,22 +346,6 @@ def plot_b50(_music_map: list = asp.music_map, profile: list = asp.profile) -> s
     music_map.sort(key=lambda x: x[9], reverse=True)
     music_b50 = music_map[:50]
     vol_force = get_overall_vf(music_b50)  # Get overall volforce
-
-    """
-    Generate text message before any wrong would happen
-    """
-    msg = ['|OVERALL VOLFORCE %.3f\n' % vol_force,
-           '|No.  |VF      |DIFF   |SCORE    |RANK  |GRA   |NAME']
-    for index in range(50):
-        valid, mid, m_type, score, clear, grade, m_time, exs, lv, vf = music_b50[index][:10]
-        if not valid:
-            break
-        inf_ver = npdb.level_table[mid][9]
-        diff = get_diff(m_type, inf_ver)
-        msg.append('\n|#%-4d|%-6.3f  |%s%-2s  |%-9s|%-6s|%-6s|%s' %
-                   ((index + 1), vf, diff, lv, score, clear_table[clear], grade_table[grade], npdb.level_table[mid][1]))
-    msg = ''.join(msg)
-    timber.debug('Generate B50 data complete.\n%s' % msg)
 
     try:  # If the plot module breaks down somehow, the function will try to return the pure text data.
         """
@@ -512,23 +489,23 @@ def plot_b50(_music_map: list = asp.music_map, profile: list = asp.profile) -> s
 
         text_layer = np.array(text_layer)
         png_superimpose(bg, text_layer)
-        output_path = '%s/%s_B50.png' % (cfg.output, validate_filename(asp.user_name))
+        output_path = '%s/B50.png' % (cfg.output)
         cv2.imwrite(output_path, bg[:, :, :3], params=[cv2.IMWRITE_PNG_COMPRESSION, 3])
 
         # an attempt to alleviate memory use
         del bg, music_map, music_b50
 
         timber.info('Plot saved at [%s] successfully.' % output_path)
-        return msg
+        return
 
     except Exception:
         timber.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
                        % format_exc())
-        return msg
+        return
 
 
 def plot_level(level: int, limits: tuple, grade_flag: str = None,
-               _music_map: list = asp.music_map, profile: list = asp.profile):
+               _music_map: list = None, profile: list = None):
     """
     Plot function to list single level records (above a specific score)
 
@@ -728,7 +705,7 @@ def plot_level(level: int, limits: tuple, grade_flag: str = None,
         return msg
 
 
-def plot_summary(base_lv: int, _music_map: list = asp.music_map, profile: list = asp.profile):
+def plot_summary(base_lv: int, _music_map: list, profile: list):
     """
     Plot function to analyze user's record.
     :param _music_map: see plot_b50

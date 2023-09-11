@@ -22,8 +22,8 @@ class Config:
             input('Press enter to continue.')
             sys.exit(1)
 
-        self.map_size, self.card_num, self.db_dir, self.game_dir, self.output, \
-        self.skin_name, self.language, self.is_init, self.version , self.web= self._read()
+        self.map_size, self.db_dir, self.game_dir, self.output, self.skin_name,\
+        self.language, self.is_init, self.version, self.appid, self.token = self._read()
 
         # validity check for paths
         path_list = self.cfg.items('Directory')
@@ -59,9 +59,6 @@ class Config:
             '# Range of mid, default as 2000\n'
             'map size = 2000\n'
             '\n'
-            '# User\'s card number in asphyxia\'s website (or database), a 16 bit long hex number sequence\n'
-            'card num = \n'
-            '\n'
             '\n'
             '[Directory]\n'
             '# Directory of sdvx@asphyxia\'s database\n'
@@ -91,10 +88,9 @@ class Config:
             'version = 0000000000\n'
             '\n'
             '\n'
-            '[Web]\n'
-            '# use web file, if you set the path will updata in web and not db path\n'
-            '# eg. web = http://www.path.com/sdvx@asphyxia.db\n'
-            'web = \n'
+            '[Bot]\n'
+            'appid =\n'
+            'token =\n'
         )
         _cfg.close()
 
@@ -102,29 +98,23 @@ class Config:
         self.cfg.read(self.path, encoding='utf-8')
 
         map_size = self.cfg.getint('Search', 'map size')
-        card_num = self.cfg.get('Search', 'card num')
         db_dir = self.cfg.get('Directory', 'db path').replace('\\', '/')
         game_dir = self.cfg.get('Directory', 'game path').replace('\\', '/')
         output = self.cfg.get('Directory', 'output path').replace('\\', '/')
-        web = self.cfg.get('Web', 'web')
         skin_name = self.cfg.get('Plot', 'skin name')
         language = self.cfg.get('Plot', 'language').upper()
         is_init = self.cfg.getboolean('Init', 'is initialized')
         version = self.cfg.getint('Init', 'version')
+        appid = self.cfg.get('Bot', 'appid')
+        token = self.cfg.get('Bot', 'token')
 
-        if not web == "":
-            if not os.path.exists("./webData"):
-                os.makedirs("./webData")
-            db_dir = "./webData/sdvx@asphyxia.db"
-        else:
-            pass
 
         timber.info('config.cfg load complete.\n'
-                    'map size  :%d\ncard num  :%s\ndb dir    :%s\ngame dir  :%s\noutput    :%s\n'
-                    'web link  :%s\nskin name :%s\nlanguage  :%s\nis init   :%s\nversion   :%d'
-                    % (map_size, card_num, db_dir, game_dir, output, web, skin_name, language, str(is_init), version))
+                    'map size  :%d\ndb dir    :%s\ngame dir  :%s\noutput    :%s\n'
+                    'skin name :%s\nlanguage  :%s\nis init   :%s\nversion   :%d'
+                    % (map_size, db_dir, game_dir, output, skin_name, language, str(is_init), version))
 
-        return map_size, card_num, db_dir, game_dir, output, skin_name, language, is_init, version, web
+        return map_size, db_dir, game_dir, output, skin_name, language, is_init, version, appid, token
 
     def _set_init_sign(self, set_bool: bool = True):
         self.cfg.set('Init', 'is initialized', str(set_bool))

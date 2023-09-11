@@ -100,7 +100,6 @@ class ASPParser:
 
         if not self.last_index:
             timber.error('Music record not found, make sure you have at least played once (and saved successfully).')
-            sys.exit(1)
 
         self.akaname = 'よろしくお願いします'  # Default akaname
         try:
@@ -115,7 +114,6 @@ class ASPParser:
         except AttributeError:
             timber.error('Profile/Skill/Crew data not found, '
                          'make sure you have at least played once (and saved successfully).')
-            sys.exit(1)
 
         timber.info('Asphyxia database parse complete.')
 
@@ -153,6 +151,3 @@ class ASPParser:
         return [self.user_name, self.ap_card, self.akaname, self.skill, self.crew_id]
 
 
-asp = ASPParser(db_dir=cfg.db_dir, map_size=cfg.map_size, card_num=cfg.card_num)
-asp.get_akaname()
-asp.get_lv_vf()

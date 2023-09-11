@@ -1,3 +1,13 @@
+# 修复和升级
+## 分支变更-version1.4.x [qqbot分支]
+- 整合最新的requirements，支持python3.11
+- 代码修复大部分UI问题
+- 该分支将接入qqbot
+- 计划架设云端，故削除在线查询功能
+- ID绑定卡数据库对应查询  
+因为新版本的UI变更，你需要替换修复版本的gen6皮肤  
+如果你使用旧版本的UI文件，因为小部分UI通过新代码适配，理应不能直接正常运行，应该使用旧版本的Saccharomyces-cerevisiae
+
 # Saccharomyces-cerevisiae
 
 An OpenCV &amp; PIL(Pillow) based sdvx@asphyxia score checker
@@ -104,10 +114,3 @@ Finally, a makeshift (using base64 encoding to convert common byte files into UT
 I use matplotlib and seaborn to generate graphs, which make the summary more like an academic report than a game profile. Fortunately, I can soon use them in my diploma paper. XD
 
 
-## 分支修复-version1.3.0
-- 修改了一些错误提示
-- b50图片生成修复（代码+文件）
-- 单曲成绩生成修复（文件）
-- 点灯生成修复（文件）
-- 查询云端db文件  
-如果需要正常生成图片，需要替换修复版本的gen6皮肤

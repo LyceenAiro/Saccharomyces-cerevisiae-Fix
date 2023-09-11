@@ -11,299 +11,117 @@ from utli.cfg_read import cfg
 from utli.logger import timber
 
 # exterior packages
-from utli import draft, sheet
+from parse.asp import ASPParser
 from genre import packet
-from parse import npdb
-from parse.asp import asp
 
-VERSION = [1, 3, 2]
+# qqbot
+import botpy,asyncio
+from botpy import logging
+from botpy.message import Message
 
+VERSION = [1, 4, 0]
 
-class SDVX:
+_log = logging.get_logger()
 
-    def __init__(self):
-        # Load skin
+class MyClient(botpy.Client):
+    async def on_ready(self):
+        self.load_skin()
+        # 初始化bot
+        _log.info(f"robot 「{self.robot.name}」 on_ready!")
+    
+    async def on_at_message_create(self, message: Message):
+        try:
+            await asyncio.wait_for(self.on_at_message_do(message), timeout=30)
+        except asyncio.TimeoutError:
+            # 处理超时逻辑
+            await message.reply(content="上传文件时超时")
+
+    async def on_at_message_do(self, message: Message):
+        userID = message.author.id
+        with open("data/card_db.txt", "r") as file:
+            lines = file.readlines()
+            updated_lines = [line for line in lines if userID not in line.split(":")[0]]
+        # 指令执行
+        if "/ping" in message.content:
+            await message.reply(content=f"{self.robot.name}收到你的消息了")
+
+        elif "/pr" in message.content:
+            if len(lines) == len(updated_lines):
+                await message.reply(content="该账号还未绑定ID")
+                return
+            asp = self.user_login(userID)
+            self.plot_skin.plot_single(sg_index=asp.last_index, _music_map=asp.music_map, profile=asp.profile)
+            await message.reply(file_image=f"{cfg.output}/pr.png")
+
+        elif "/b50" in message.content:
+            if len(lines) == len(updated_lines):
+                await message.reply(content="该账号还未绑定ID")
+                return
+            asp = self.user_login(userID)
+            self.plot_skin.plot_b50(_music_map=asp.music_map, profile=asp.profile)
+            await message.reply(file_image=f"{cfg.output}/B50.png")
+
+        elif "/bind" in message.content.split()[1]:
+            try:
+                cardID = message.content.split()[2]
+                if len(message.content.split()[2]) != 16:
+                    await message.reply(content="绑定失败,卡号应该为16位")
+                    return
+            except:
+                await message.reply(content="绑定卡号指令格式\n/bind [卡号]")
+                return
+            with open("data/card_db.txt", "r") as file:
+                for line in file:
+                    user_id = line.strip().split(":")[0]
+                    if user_id == userID:
+                        await message.reply(content="绑定失败,该账户已经绑定了卡号")
+                        return
+            with open("data/card_db.txt", "a") as file:
+                file.write(f"{userID}:{cardID}\n")
+            await message.reply(content=f"成功绑定了ID号{cardID}")
+
+        elif "/unbind" in message.content:
+            if len(lines) == len(updated_lines):
+                await message.reply(content="该账号还未绑定ID")
+                return
+            with open("data/card_db.txt", "w") as file:
+                file.writelines(updated_lines)
+            await message.reply(content="解绑成功")
+
+        elif "/help" in message.content:
+            helpmsg = "/ping\t查询运行状态\n/b50\t获取b50信息\n/pr\t\t最近游玩信息\n/bind [ID]\t绑定ID\n/unbind\t解绑ID\n/help\t帮助"
+            await message.reply(content=helpmsg)
+
+        else:
+            await message.reply(content="暂时还没有这个指令嗷嗷嗷")
+    
+    def load_skin(self):
+        # 初始化skin
         try:
             self.plot_skin = packet[cfg.skin_name].main
         except KeyError:
             timber.error('Invalid skin name, please check your configurations.')
             sys.exit(1)
-
-    def _get_b50(self):
-        self.updata_WebDB()
-        print(self.plot_skin.plot_b50())
-        input(draft.CommonMsg.enter())
-
-    def _get_summary(self, base_lv: int):
-        self.updata_WebDB()
-        print(self.plot_skin.plot_summary(base_lv=base_lv))
-        input(draft.CommonMsg.enter())
-
-    def _get_single(self, sg_index: int):
-        self.updata_WebDB()
-        print(self.plot_skin.plot_single(sg_index=sg_index))
-        input(draft.CommonMsg.enter())
-
-    def _get_level(self, level: int, limits: tuple, grade_flag: str):
-        self.updata_WebDB()
-        print(self.plot_skin.plot_level(level=level, limits=limits, grade_flag=grade_flag))
-        input(draft.CommonMsg.enter())
-
-    def updata_WebDB(self):
-        if not cfg.web == "":
-            try:
-                urllib.request.urlretrieve(cfg.web, "./webData/sdvx@asphyxia.db")
-            except:
-                print("updata web error")
-        else:
-            pass
-
-    def _1_get_b50(self):
-        os.system('cls')
-        self._get_b50()
-
-    def _2_get_summary(self):
-        os.system('cls')
-        base_lv = input(draft.TwoGetSummary.init_hint())
-        timber.debug('Get summary from level "%s"' % base_lv)
-
-        if not base_lv:
-            self._get_summary(17)
-            return
-
-        try:
-            base_lv = int(base_lv)
-            if base_lv > 20 or base_lv < 1:
-                raise ValueError
-        except ValueError:
-            timber.warning('Invalid level number')
-            print(draft.CommonMsg.invalid_lv_num())
-            input(draft.CommonMsg.enter())
-            return
-
-        self._get_summary(base_lv)
-
-    def _3_get_recent(self):
-        print(draft.ThreeGetRecent.init_hint())
-        self._get_single(asp.last_index)
-
-    def _4_get_specific(self):
-        def not_found_handler():
-            timber.debug('Record not found.')
-            input(draft.FourGetSpecific.not_found())
-
-        sg_index = 0
-        sep_arg = input(draft.FourGetSpecific.init_hint()).split()
-        timber.debug('Get specific "%s"' % ' '.join(sep_arg))
-
-        if len(sep_arg) == 1:  # Default highest difficulty
-            try:
-                mid = int(sep_arg[0])
-                if mid > cfg.map_size:
-                    not_found_handler()
-                    return
-            except ValueError:
-                timber.warning('Invalid character')
-                print(draft.FourGetSpecific.invalid_char())
-                input(draft.CommonMsg.enter())
-                return
-            for lv_index in range(4, -1, -1):
-                index = mid * 5 + lv_index
-                if asp.music_map[index][0]:
-                    sg_index = index
+    
+    def user_login(self, userID):
+        # 用户数据获取
+        with open("data/card_db.txt", "r") as file:
+            for line in file:
+                user_id, card_number = line.strip().split(":")
+                if user_id == userID:
+                    found_card = card_number
                     break
-
-        elif len(sep_arg) == 2:  # Stipulated difficulty
-            try:
-                mid, m_type = int(sep_arg[0]), int(sep_arg[1])
-                if mid > cfg.map_size:
-                    not_found_handler()
-                    return
-            except ValueError:
-                timber.warning('Invalid character')
-                print(draft.FourGetSpecific.invalid_char())
-                input(draft.CommonMsg.enter())
-                return
-
-            if m_type >= 4:  # 4th difficulty
-                mxm_index = mid * 5 + m_type
-                inf_index = mid * 5 + m_type - 1
-                if asp.music_map[mxm_index][0]:
-                    sg_index = mxm_index
-                elif asp.music_map[inf_index][0]:
-                    sg_index = inf_index
-
-            elif m_type > 0:  # 1st ~ 3rd difficulty
-                index = mid * 5 + m_type - 1
-                if asp.music_map[index][0]:
-                    sg_index = index
-
-        else:
-            timber.warning('Excessive operator')
-            print(draft.FourGetSpecific.invalid_arg_num())
-            input(draft.CommonMsg.enter())
-            return
-
-        if not sg_index:
-            not_found_handler()
-            return
-
-        print(draft.FourGetSpecific.search_res(sep_arg))
-        self._get_single(sg_index)
-
-    def _5_get_level(self):
-        os.system('cls')
-        level = input(draft.FiveGetLevel.init_hint())
-        timber.debug('Level "%s"' % level)
-        try:
-            level = int(level)
-            if level > 20 or level < 1:
-                raise ValueError
-        except ValueError:
-            timber.warning('Invalid input')
-            print(draft.CommonMsg.invalid_lv_num())
-            input(draft.CommonMsg.enter())
-            return
-
-        threshold = input(draft.FiveGetLevel.threshold()).upper().replace('P', '+')
-        timber.debug('Score limit %s' % threshold)
-
-        if not threshold:  # entered nothing, default as querying all
-            limits, grade_flag = (0, 10000000), 'ALL'
-            print(draft.FiveGetLevel.all_songs(level))
-        else:  # entered something, need further validity check
-            try:
-                # scores at a specific grade
-                limits = sheet.score_table[threshold]
-                grade_flag = threshold
-            except KeyError:
-                # scores between 2 limits
-
-                # thou should enter only 2 numbers separated with '-'
-                limits = threshold.split('-')
-                if len(limits) != 2:
-                    timber.warning('Invalid score')
-                    print(draft.FiveGetLevel.invalid_sep())
-                    input(draft.CommonMsg.enter())
-                    return
-
-                try:  # thou should enter numbers between 0 and 10m
-                    lim_1, lim_2 = int(limits[0]), int(limits[1])
-                    if lim_1 > 10000000 or lim_1 < 0 or lim_2 > 10000000 or lim_2 < 0:
-                        raise ValueError('')
-                except ValueError:
-                    timber.warning('Invalid input')
-                    print(draft.FiveGetLevel.invalid_score())
-                    input(draft.CommonMsg.enter())
-                    return
-
-                limits, grade_flag = (min(lim_1, lim_2), max(lim_1, lim_2)), None
-
-            if grade_flag:
-                print(draft.FiveGetLevel.grade_songs(level, grade_flag))
-            else:
-                print(draft.FiveGetLevel.limit_songs(level, limits[0], limits[1]))
-        self._get_level(level, limits, grade_flag)
-
-    @staticmethod
-    def _8_search():
-        os.system('cls')
-        search_str = input(draft.EightSearch.init_hint())
-        timber.debug('Searching "%s"' % search_str)
-
-        if search_str:
-            result_list = []
-            for index in range(1, cfg.map_size):
-                try:
-                    if re.search(search_str, npdb.search_db[index], re.I):
-                        result_list.append(index)
-                except re.error:
-                    timber.warning('Regular expression crashed.')
-                    print(draft.EightSearch.re_crash())
-                    input(draft.CommonMsg.enter())
-                    return
-
-            search_res = ['%d result(s) found:\n'
-                          '|No  |MID   |Level        |Date        |Yomigana\n'
-                          '     |Name  -  Artist' % len(result_list)]
-            for index in range(len(result_list)):
-                _mid = result_list[index]
-                _data = npdb.level_table[_mid]
-                _date = '%s/%s/%s' % (_data[7][:4], _data[7][4:6], _data[7][6:])
-                search_res.append('\n\n|%-4d|%-4d  |%s/%s/%s/%s  |%-8s  |%s\n     |%s  -  %s' %
-                                  (index + 1, _mid, _data[10].zfill(2), _data[13].zfill(2), _data[16].zfill(2),
-                                   str(int(_data[19]) + int(_data[22])).zfill(2), _date, _data[2], _data[1], _data[3]))
-
-            res_num = len(result_list)
-            search_res = ''.join(search_res)
-
-            if res_num:
-                timber.debug(search_res)
-                print(draft.EightSearch.success(res_num, search_res))
-            else:
-                timber.debug('Search failed.')
-                print(draft.EightSearch.failed())
-        else:
-            print(draft.EightSearch.empty())
-        input(draft.CommonMsg.enter())
-
-    @staticmethod
-    def _9_faq():
-        os.system('cls')
-        timber.debug('FAQ')
-        print(draft.NineFAQ.first(asp.user_name))
-        print(draft.NineFAQ.second())
-        input(draft.CommonMsg.enter())
-
-    @staticmethod
-    def _0_see_you_next_time():
-        timber.debug('Exit by operator number 0.')
-        print(draft.ZeroExit.farewell(asp.user_name))
-        time.sleep(1.5)
-        sys.exit(0)
-
-    @staticmethod
-    def _10_donate():
-        os.system('cls')
-        timber.debug('Ali-pay is also recommended.')
-        print(draft.TenDonate.init_hint())
-        input(draft.TenDonate.back_to_light())
-
-    def input_handler(self):
-        key_dict = {
-            '1': self._1_get_b50,
-            '2': self._2_get_summary,
-            '3': self._3_get_recent,
-            '4': self._4_get_specific,
-            '5': self._5_get_level,
-            '8': self._8_search,
-            '9': self._9_faq,
-            '0': self._0_see_you_next_time,
-            '10': self._10_donate
-        }
-
-        os.system('cls')
-        time.sleep(0.05)
-        print(draft.TitleMsg.title(VERSION), end='')
-        while True:
-            base_arg = input()
-            timber.debug('Get user operator %s' % base_arg)
-            try:
-                key_dict[base_arg]()
-                break
-            except KeyError:
-                pass
+        asp = ASPParser(db_dir=cfg.db_dir, map_size=cfg.map_size, card_num=found_card)
+        asp.get_akaname()
+        asp.get_lv_vf()
+        return asp
 
 
 if __name__ == '__main__':
-    try:
-        sdvx = SDVX()
-        while True:
-            sdvx.input_handler()
-    except Exception:
-        timber.error('Fatal error occurs, please report the following message to developer.\n%s' % format_exc())
-        sys.exit(1)
-
-"""
-pyinstaller -i sjf.ico -F app.py
-"""
+    if not os.path.exists("data/card_db.txt"):
+        with open("data/card_db.txt", "a") as file:
+            file.write("1:1\n")
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=cfg.appid, token=cfg.token)
+    
