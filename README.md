@@ -1,5 +1,10 @@
 # 修复和升级
-## 分支变更-version1.4.x [qqbot分支]
+## 功能添加-version1.4.1
+- 接入基于aqua的mysql数据库
+- 正在开发ongeki的查分模块
+- 更多指令分区
+- 非指令动作
+## 分支变更-version1.4.0 [qqbot分支]
 - 整合最新的requirements，支持python3.11
 - 代码修复大部分UI问题
 - 该分支将接入qqbot

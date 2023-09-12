@@ -19,7 +19,7 @@ import botpy,asyncio
 from botpy import logging
 from botpy.message import Message
 
-VERSION = [1, 4, 0]
+VERSION = [1, 4, 1]
 
 _log = logging.get_logger()
 
@@ -42,58 +42,79 @@ class MyClient(botpy.Client):
             lines = file.readlines()
             updated_lines = [line for line in lines if userID not in line.split(":")[0]]
         # 指令执行
-        if "/ping" in message.content:
-            await message.reply(content=f"{self.robot.name}收到你的消息了")
-
-        elif "/pr" in message.content:
-            if len(lines) == len(updated_lines):
-                await message.reply(content="该账号还未绑定ID")
-                return
-            asp = self.user_login(userID)
-            self.plot_skin.plot_single(sg_index=asp.last_index, _music_map=asp.music_map, profile=asp.profile)
-            await message.reply(file_image=f"{cfg.output}/pr.png")
-
-        elif "/b50" in message.content:
-            if len(lines) == len(updated_lines):
-                await message.reply(content="该账号还未绑定ID")
-                return
-            asp = self.user_login(userID)
-            self.plot_skin.plot_b50(_music_map=asp.music_map, profile=asp.profile)
-            await message.reply(file_image=f"{cfg.output}/B50.png")
-
-        elif "/bind" in message.content.split()[1]:
-            try:
-                cardID = message.content.split()[2]
-                if len(message.content.split()[2]) != 16:
-                    await message.reply(content="绑定失败,卡号应该为16位")
-                    return
-            except:
-                await message.reply(content="绑定卡号指令格式\n/bind [卡号]")
-                return
-            with open("data/card_db.txt", "r") as file:
-                for line in file:
-                    user_id = line.strip().split(":")[0]
-                    if user_id == userID:
-                        await message.reply(content="绑定失败,该账户已经绑定了卡号")
+        if message.content.split()[1].startswith("/"):
+            # 在线查询
+            if "/ping" in message.content.split()[1]:
+                await message.reply(content=f"{self.robot.name}收到你的消息了")
+            
+            elif "/sdvx" in message.content.split()[1]:
+                # 查询最近游玩歌曲的最佳成绩
+                if "pr" in message.content.split()[2]:
+                    if len(lines) == len(updated_lines):
+                        await message.reply(content="该账号还未绑定KonamiID")
                         return
-            with open("data/card_db.txt", "a") as file:
-                file.write(f"{userID}:{cardID}\n")
-            await message.reply(content=f"成功绑定了ID号{cardID}")
+                    asp = self.user_login(userID)
+                    self.plot_skin.plot_single(sg_index=asp.last_index, _music_map=asp.music_map, profile=asp.profile)
+                    await message.reply(file_image=f"{cfg.output}/pr.png")
 
-        elif "/unbind" in message.content:
-            if len(lines) == len(updated_lines):
-                await message.reply(content="该账号还未绑定ID")
-                return
-            with open("data/card_db.txt", "w") as file:
-                file.writelines(updated_lines)
-            await message.reply(content="解绑成功")
+                # 查询best50
+                elif "b50" in message.content.split()[2]:
+                    if len(lines) == len(updated_lines):
+                        await message.reply(content="该账号还未绑定KonamiID")
+                        return
+                    asp = self.user_login(userID)
+                    self.plot_skin.plot_b50(_music_map=asp.music_map, profile=asp.profile)
+                    await message.reply(file_image=f"{cfg.output}/B50.png")
 
-        elif "/help" in message.content:
-            helpmsg = "/ping\t查询运行状态\n/b50\t获取b50信息\n/pr\t\t最近游玩信息\n/bind [ID]\t绑定ID\n/unbind\t解绑ID\n/help\t帮助"
-            await message.reply(content=helpmsg)
+            elif "/konami" in message.content.split()[1]:
+                # 绑定B系账户
+                if "bind" in message.content.split()[2]:
+                    try:
+                        cardID = message.content.split()[3]
+                        if len(cardID) != 16:
+                            await message.reply(content="绑定失败,KonamiID应该为16位")
+                            return
+                    except:
+                        await message.reply(content="绑定KonamiID指令格式\n/bind [ID]")
+                        return
+                    with open("data/card_db.txt", "r") as file:
+                        for line in file:
+                            user_id = line.strip().split(":")[0]
+                            if user_id == userID:
+                                await message.reply(content="绑定失败,该账户已经绑定了KonamiID")
+                                return
+                    with open("data/card_db.txt", "a") as file:
+                        file.write(f"{userID}:{cardID}\n")
+                    await message.reply(content=f"成功绑定了KonamiID号{cardID}")
 
+                # 取消绑定B系账户
+                elif "unbind" in message.content.split()[2]:
+                    if len(lines) == len(updated_lines):
+                        await message.reply(content="该账号还未绑定ID")
+                        return
+                    with open("data/card_db.txt", "w") as file:
+                        file.writelines(updated_lines)
+                    await message.reply(content="解绑成功")
+
+            # 帮助页面
+            elif "/help" in message.content.split()[1]:
+                helpmsg = ("指令帮助\n"
+                "/ping\t查询运行状态\n"
+                "/sdvx b50\t获取b50信息\n"
+                "/sdvx pr\t\t最近游玩信息\n"
+                "/konami bind [ID]\t绑定ID\n"
+                "/konami unbind\t解绑ID\n"
+                "/help\t帮助")
+                await message.reply(content=helpmsg)
+
+            else:
+                await message.reply(content="暂时还没有这个指令嗷嗷嗷")
+
+        # 非指令动作
+        elif "摸摸" in message.content.split()[1]:
+            await message.reply(content="好舒服")
         else:
-            await message.reply(content="暂时还没有这个指令嗷嗷嗷")
+            await message.reply(content="嗷呜")
     
     def load_skin(self):
         # 初始化skin
