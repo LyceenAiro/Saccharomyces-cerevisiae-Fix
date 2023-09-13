@@ -94,12 +94,12 @@ class Config:
             'token = \n'
             '\n'
             '\n'
-            '[Mysql]'
-            '# If you want to search ongeki score with aqua must use Mysql'
-            'host = localhost'
-            'user = user'
-            'password = pwd'
-            'database = aqua'
+            '[Mysql]\n'
+            '# If you want to search ongeki score with aqua must use Mysql\n'
+            'host = localhost\n'
+            'user = user\n'
+            'password = pwd\n'
+            'database = aqua\n'
 
         )
         _cfg.close()

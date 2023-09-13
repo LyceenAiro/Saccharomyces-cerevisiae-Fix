@@ -2,7 +2,7 @@ from os import path
 import sys
 
 # The very initial message
-print('More information at https://github.com/Nyanm/Saccharomyces-cerevisiae')
+print('More information at https://github.com/LyceenAiro/Saccharomyces-cerevisiae-Fix')
 
 TEST_MODE = 1
 # Turn off test mode when packing the program
