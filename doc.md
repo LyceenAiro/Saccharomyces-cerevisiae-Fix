@@ -25,3 +25,12 @@
 /aime bind [ID]
 /aime unbind
 ```
+### 使用aimeID查询ongeki分数
+查询用户信息
+```
+/ongeki user
+```
+查询最近游玩记录
+```
+/ongeki pr
+```
