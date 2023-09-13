@@ -134,6 +134,7 @@ class MyClient(botpy.Client):
                     "/ping\t\t\t查询运行状态\n"
                     "/sdvx b50\t\t获取b50信息\n"
                     "/sdvx pr\t\t\t最近游玩信息\n"
+                    "/sdvx sm\t\t\t17+点灯信息\n"
                     "/konami bind [ID]\t绑定ID\n"
                     "/konami unbind\t解绑ID\n"
                     "/help [page]\t\t帮助\n"
