@@ -1,6 +1,6 @@
 from os import mkdir, path
 from configparser import ConfigParser
-import sys,os
+import sys
 
 from xml.etree.cElementTree import parse
 
@@ -23,7 +23,8 @@ class Config:
             sys.exit(1)
 
         self.map_size, self.db_dir, self.game_dir, self.output, self.skin_name,\
-        self.language, self.is_init, self.version, self.appid, self.token = self._read()
+        self.language, self.is_init, self.version, self.appid, self.token,\
+        self.mysql_host, self.mysql_user, self.mysql_pwd, self.mysql_db= self._read()
 
         # validity check for paths
         path_list = self.cfg.items('Directory')
@@ -89,8 +90,17 @@ class Config:
             '\n'
             '\n'
             '[Bot]\n'
-            'appid =\n'
-            'token =\n'
+            'appid = \n'
+            'token = \n'
+            '\n'
+            '\n'
+            '[Mysql]'
+            '# If you want to search ongeki score with aqua must use Mysql'
+            'host = localhost'
+            'user = user'
+            'password = pwd'
+            'database = aqua'
+
         )
         _cfg.close()
 
@@ -107,6 +117,10 @@ class Config:
         version = self.cfg.getint('Init', 'version')
         appid = self.cfg.get('Bot', 'appid')
         token = self.cfg.get('Bot', 'token')
+        mysql_host = self.cfg.get('Mysql', 'host')
+        mysql_user = self.cfg.get('Mysql', 'user')
+        mysql_pwd = self.cfg.get('Mysql', 'password')
+        mysql_db = self.cfg.get('Mysql', 'database')
 
 
         timber.info('config.cfg load complete.\n'
@@ -114,7 +128,7 @@ class Config:
                     'skin name :%s\nlanguage  :%s\nis init   :%s\nversion   :%d'
                     % (map_size, db_dir, game_dir, output, skin_name, language, str(is_init), version))
 
-        return map_size, db_dir, game_dir, output, skin_name, language, is_init, version, appid, token
+        return map_size, db_dir, game_dir, output, skin_name, language, is_init, version, appid, token, mysql_host, mysql_user, mysql_pwd, mysql_db
 
     def _set_init_sign(self, set_bool: bool = True):
         self.cfg.set('Init', 'is initialized', str(set_bool))

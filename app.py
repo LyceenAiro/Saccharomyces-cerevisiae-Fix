@@ -1,10 +1,7 @@
 # non-local packages
 import os
-import re
 import sys
-import time
-import urllib.request
-from traceback import format_exc
+# from traceback import format_exc
 
 # interior packages
 from utli.cfg_read import cfg
@@ -19,6 +16,10 @@ import botpy,asyncio
 from botpy import logging
 from botpy.message import Message
 
+# mysql
+from ongeki.SELECT import *
+import mysql.connector
+
 VERSION = [1, 4, 1]
 
 _log = logging.get_logger()
@@ -26,8 +27,9 @@ _log = logging.get_logger()
 class MyClient(botpy.Client):
     async def on_ready(self):
         self.load_skin()
+        self.initSQL()
         # 初始化bot
-        _log.info(f"robot 「{self.robot.name}」 on_ready!")
+        _log.info(f"\t[botpy]「{self.robot.name}」 准备完毕！")
     
     async def on_at_message_create(self, message: Message):
         try:
@@ -44,12 +46,13 @@ class MyClient(botpy.Client):
         # 指令执行
         if message.content.split()[1].startswith("/"):
             # 在线查询
-            if "/ping" in message.content.split()[1]:
+            if "/ping" == message.content.split()[1]:
                 await message.reply(content=f"{self.robot.name}收到你的消息了")
             
-            elif "/sdvx" in message.content.split()[1]:
+            # sdvx查询
+            elif "/sdvx" == message.content.split()[1]:
                 # 查询最近游玩歌曲的最佳成绩
-                if "pr" in message.content.split()[2]:
+                if "pr" == message.content.split()[2]:
                     if len(lines) == len(updated_lines):
                         await message.reply(content="该账号还未绑定KonamiID")
                         return
@@ -58,17 +61,20 @@ class MyClient(botpy.Client):
                     await message.reply(file_image=f"{cfg.output}/pr.png")
 
                 # 查询best50
-                elif "b50" in message.content.split()[2]:
+                elif "b50" == message.content.split()[2]:
                     if len(lines) == len(updated_lines):
                         await message.reply(content="该账号还未绑定KonamiID")
                         return
                     asp = self.user_login(userID)
                     self.plot_skin.plot_b50(_music_map=asp.music_map, profile=asp.profile)
                     await message.reply(file_image=f"{cfg.output}/B50.png")
+                else:
+                    return
 
-            elif "/konami" in message.content.split()[1]:
+            # konamiID
+            elif "/konami" == message.content.split()[1]:
                 # 绑定B系账户
-                if "bind" in message.content.split()[2]:
+                if "bind" == message.content.split()[2]:
                     try:
                         cardID = message.content.split()[3]
                         if len(cardID) != 16:
@@ -88,23 +94,58 @@ class MyClient(botpy.Client):
                     await message.reply(content=f"成功绑定了KonamiID号{cardID}")
 
                 # 取消绑定B系账户
-                elif "unbind" in message.content.split()[2]:
+                elif "unbind" == message.content.split()[2]:
                     if len(lines) == len(updated_lines):
                         await message.reply(content="该账号还未绑定ID")
                         return
                     with open("data/card_db.txt", "w") as file:
                         file.writelines(updated_lines)
                     await message.reply(content="解绑成功")
+                else:
+                    return
+            
+            # aimeID
+            elif "/aime" == message.content.split()[1]:
+               # 绑定aimeID
+                if "bind" == message.content.split()[2]:
+                    await message.reply(content=bind_id(userID, message.content.split()[3]))
+                elif "unbind" == message.content.split()[2]:
+                    await message.reply(content=unbind_id(userID))
+                else:
+                    return
+
+            # 音击
+            elif "/ongeki" == message.content.split()[1]:
+                # 获取用户信息
+                if "user" == message.content.split()[2]:
+                    await message.reply(content=user_pack(userID))
+                elif "pr" == message.content.split()[2]:
+                    await message.reply(content=do_pr(userID))
+                else:
+                    return
 
             # 帮助页面
-            elif "/help" in message.content.split()[1]:
+            elif "/help" == message.content.split()[1]:
                 helpmsg = ("指令帮助\n"
-                "/ping\t查询运行状态\n"
-                "/sdvx b50\t获取b50信息\n"
-                "/sdvx pr\t\t最近游玩信息\n"
-                "/konami bind [ID]\t绑定ID\n"
-                "/konami unbind\t解绑ID\n"
-                "/help\t帮助")
+                    "/ping\t\t\t查询运行状态\n"
+                    "/sdvx b50\t\t获取b50信息\n"
+                    "/sdvx pr\t\t\t最近游玩信息\n"
+                    "/konami bind [ID]\t绑定ID\n"
+                    "/konami unbind\t解绑ID\n"
+                    "/help [page]\t\t帮助\n"
+                    "————————————————\n"
+                    "声明：该bot代码开源且完全免费！！！\n"
+                    "GitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
+                if len(message.content.split()) > 2:
+                    if "2" == message.content.split()[2]:
+                        helpmsg = ("指令帮助\n"
+                        "/aime bind [ID]\t绑定AimeID\n"
+                        "/aime unbind\t\t解绑AimeID\n"
+                        "/ongeki user\t\t展示用户信息\n"
+                        "/help [page]\t\t帮助\n"
+                        "————————————————\n"
+                        "声明：该bot代码开源且完全免费！！！\n"
+                        "GitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
                 await message.reply(content=helpmsg)
 
             else:
@@ -112,10 +153,10 @@ class MyClient(botpy.Client):
 
         # 非指令动作
         elif "摸摸" in message.content.split()[1]:
-            await message.reply(content="好舒服")
+            await message.reply(content="嘿嘿~好舒服uwu")
         else:
-            await message.reply(content="嗷呜")
-    
+            await message.reply(content="嗷呜~")
+
     def load_skin(self):
         # 初始化skin
         try:
@@ -124,8 +165,32 @@ class MyClient(botpy.Client):
             timber.error('Invalid skin name, please check your configurations.')
             sys.exit(1)
     
+    def initSQL(self):
+        try:
+            cnx = mysql.connector.connect(
+                host = cfg.mysql_host,
+                user = cfg.mysql_user,
+                password = cfg.mysql_pwd,
+                database = cfg.mysql_db
+            )
+            cursor = cnx.cursor()
+            cursor.execute(f"SHOW TABLES LIKE 'qq_card'")
+            result = cursor.fetchone()
+            if not result:
+                create_table_query = """
+                CREATE TABLE qq_card (
+                    qqid VARCHAR(20) UNIQUE,
+                    aimeid VARCHAR(8) UNIQUE
+                )
+                """
+                cursor.execute(create_table_query)
+            cursor.close()
+            cnx.close()
+        except:
+            print("[Error]\taqua数据库连接失败")
+    
     def user_login(self, userID):
-        # 用户数据获取
+        # Konami用户数据获取
         with open("data/card_db.txt", "r") as file:
             for line in file:
                 user_id, card_number = line.strip().split(":")
