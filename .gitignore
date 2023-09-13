@@ -7,7 +7,7 @@ dist
 upx*
 
 # 调试文件
-/botpy.log.*
+botpy.*
 /config.yaml
 /__showcase
 /img_archive
