@@ -68,6 +68,10 @@ class MyClient(botpy.Client):
                     asp = self.user_login(userID)
                     self.plot_skin.plot_b50(_music_map=asp.music_map, profile=asp.profile)
                     await message.reply(file_image=f"{cfg.output}/B50.png")
+                
+                # 查询点灯信息
+                elif "sm" == message.content.split()[2]:
+                    await message.reply(content="该功能正在开发中")
                 else:
                     return
 
@@ -126,7 +130,7 @@ class MyClient(botpy.Client):
 
             # 帮助页面
             elif "/help" == message.content.split()[1]:
-                helpmsg = ("指令帮助\n"
+                helpmsg = ("指令帮助[1-sdvx]\n"
                     "/ping\t\t\t查询运行状态\n"
                     "/sdvx b50\t\t获取b50信息\n"
                     "/sdvx pr\t\t\t最近游玩信息\n"
@@ -138,10 +142,11 @@ class MyClient(botpy.Client):
                     "GitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
                 if len(message.content.split()) > 2:
                     if "2" == message.content.split()[2]:
-                        helpmsg = ("指令帮助\n"
+                        helpmsg = ("指令帮助[2-ongeki]\\n"
                         "/aime bind [ID]\t绑定AimeID\n"
                         "/aime unbind\t\t解绑AimeID\n"
                         "/ongeki user\t\t展示用户信息\n"
+                        "/ongeki pr\t\t查询最近一次游玩信息\n"
                         "/help [page]\t\t帮助\n"
                         "————————————————\n"
                         "声明：该bot代码开源且完全免费！！！\n"
