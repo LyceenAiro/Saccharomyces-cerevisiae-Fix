@@ -177,7 +177,8 @@ class MyClient(botpy.Client):
                 host = cfg.mysql_host,
                 user = cfg.mysql_user,
                 password = cfg.mysql_pwd,
-                database = cfg.mysql_db
+                database = cfg.mysql_db,
+                port = cfg.mysql_port
             )
             cursor = cnx.cursor()
             cursor.execute(f"SHOW TABLES LIKE 'qq_card'")
