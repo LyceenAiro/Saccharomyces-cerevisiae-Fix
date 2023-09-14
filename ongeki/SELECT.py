@@ -37,21 +37,31 @@ def bind_id(qq_id, aime):
     cursor.execute(f"SELECT qqid FROM qq_card where aimeid='{aime}'")
     binded = cursor.fetchall()
     if not card_save:
+        cursor.close()
+        cnx.close()
         return "未找到AimeID"
     else:
         if not AimeID:
             if not binded:
-                if len(aime) != 8:
+                if len(aime) > 10:
                     return "AimeID错误"
                 try:
                     cursor.execute(f"INSERT INTO qq_card (qqid, aimeid) VALUES ('{qq_id}', '{aime}')")
                     cnx.commit()
+                    cursor.close()
+                    cnx.close()
                     return "绑定成功"
                 except:
+                    cursor.close()
+                    cnx.close()
                     return "绑定失败"
             else:
+                cursor.close()
+                cnx.close()
                 return "AimeID已经被绑定了"
         else:
+            cursor.close()
+            cnx.close()
             return "已经绑定了AimeID"
 
 
@@ -61,6 +71,8 @@ def do_pr(qq_id):
     cursor.execute(f"SELECT aimeid FROM qq_card where qqid='{qq_id}'")
     AimeID = cursor.fetchall()
     if not AimeID:
+        cursor.close()
+        cnx.close()
         return "未绑定AimeID"
     AimeID = AimeID[0][0]
     cursor.execute(f"SELECT id FROM sega_card where ext_id='{AimeID}'")
@@ -85,11 +97,12 @@ def do_pr(qq_id):
         full_combo = "FC"
     if cur[0][7] == 1:
         full_bell = "FB"
-
     music_id = cur[0][2]
     music_level = cur[0][3]
     cursor.execute(f"SELECT artist_name, name, {level[music_level]},  FROM ongeki_game_music where id='{music_id}'")
     music_list = cursor.fetchall()
+    cursor.close()
+    cnx.close()
     difficulty = float(music_list[0][2].replace(',', '.'))
     rt_name, rt_score = rating(cur[0][0], difficulty)
     back = f"{music_list[0][0]}  -  {music_list[0][1]}\n" + \
@@ -111,9 +124,13 @@ def unbind_id(qq_id):
     cursor.execute(f"SELECT qqid FROM qq_card where qqid='{qq_id}'")
     card_save = cursor.fetchall()
     if not card_save:
+        cursor.close()
+        cnx.close()
         return "还未绑定AimeID"
     cursor.execute(f"DELETE FROM qq_card WHERE qqid = '{qq_id}'")
     cnx.commit()
+    cursor.close()
+    cnx.close()
     return "解绑成功"
     
 
@@ -124,6 +141,8 @@ def user_pack(qq_id):
     cursor.execute(f"SELECT aimeid FROM qq_card where qqid='{qq_id}'")
     AimeID = cursor.fetchall()
     if not AimeID:
+        cursor.close()
+        cnx.close()
         return "未绑定AimeID"
     AimeID = AimeID[0][0]
     cursor.execute(f"SELECT id FROM sega_card where ext_id='{AimeID}'")
@@ -131,6 +150,8 @@ def user_pack(qq_id):
     user = user[0][0]
     cursor.execute(f"SELECT user_name, play_count, level, player_rating, highest_rating, battle_point, last_play_date  FROM ongeki_user_data where aime_card_id='{user}'")
     cur = cursor.fetchall()
+    cursor.close()
+    cnx.close()
     back = "———————————————\n" + \
         f"Aime ID\t\t{AimeID}\n" + \
         f"Name\t\t{cur[0][0]}\n" + \
