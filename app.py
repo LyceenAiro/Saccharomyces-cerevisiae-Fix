@@ -5,7 +5,6 @@ import sys
 
 # interior packages
 from utli.cfg_read import cfg
-from utli.logger import timber
 
 # exterior packages
 from parse.asp import ASPParser
@@ -14,6 +13,7 @@ from genre import packet
 # qqbot
 import botpy,asyncio
 from botpy import logging
+_log = logging.get_logger()
 from botpy.message import Message
 
 # mysql
@@ -22,7 +22,6 @@ import mysql.connector
 
 VERSION = [1, 4, 1]
 
-_log = logging.get_logger()
 
 class MyClient(botpy.Client):
     async def on_ready(self):
@@ -122,9 +121,11 @@ class MyClient(botpy.Client):
             elif "/ongeki" == message.content.split()[1]:
                 # 获取用户信息
                 if "user" == message.content.split()[2]:
-                    await message.reply(content=user_pack(userID))
+                    await message.reply(content=get_ongeki_user(userID))
                 elif "pr" == message.content.split()[2]:
-                    await message.reply(content=do_pr(userID))
+                    await message.reply(content=get_ongeki_pr(userID))
+                elif "b30" == message.content.split()[2]:
+                    await message.reply(content=get_ongeki_b30(userID))
                 else:
                     return
 
@@ -148,6 +149,7 @@ class MyClient(botpy.Client):
                         "/aime unbind\t\t解绑AimeID\n"
                         "/ongeki user\t\t展示用户信息\n"
                         "/ongeki pr\t\t查询最近一次游玩信息\n"
+                        "/ongeki b30\t\t查询最好的30首成绩(beta)\n"
                         "/help [page]\t\t帮助\n"
                         "————————————————\n"
                         "声明：该bot代码开源且完全免费！！！\n"
@@ -168,7 +170,7 @@ class MyClient(botpy.Client):
         try:
             self.plot_skin = packet[cfg.skin_name].main
         except KeyError:
-            timber.error('Invalid skin name, please check your configurations.')
+            _log.error('没有查询到你选择的皮肤包，请重新在配置文件中选择.')
             sys.exit(1)
     
     def initSQL(self):
@@ -194,7 +196,7 @@ class MyClient(botpy.Client):
             cursor.close()
             cnx.close()
         except:
-            print("[Error]\taqua数据库连接失败")
+            print("[Error]\taqua数据库连接失败，如果这是你第一次连接数据库，请重启直至连接成功")
     
     def user_login(self, userID):
         # Konami用户数据获取

@@ -1,17 +1,22 @@
 import mysql.connector
+import math
 from utli.cfg_read import cfg
 
 from .cul import *
 
-cnx = None
+from botpy import logging
+_log = logging.get_logger()
+
 level = {0: "level0", 1: "level1", 2: "level2", 3: "level3", 10: "level4"}
 level_name = {0: "BASIC", 1: "ADVANCED", 2: "EXPERT", 3: "MASTER", 10: "LUNATIC"}
-battle_name = {0: "BASIC", 1: "ADVANCED", 2: "EXPERT", 3: "MASTER", 10: "LUNATIC"}
+# battle_name = {0: "NOFILE", 1: "ADVANCED", 2: "EXPERT", 3: "MASTER", 10: "LUNATIC"}
 
-def mysql_login():
-    global cnx
-    if cnx is not None:
-        return cnx.cursor()
+def bind_id(qq_id, aime):
+    # 绑定用户
+    # 防止注入
+    _log.info(f"\t[SELECT] 执行绑定aimeID")
+    if not aime.isdigit():
+        return "AimeID错误"
     # 连接数据库
     cnx = mysql.connector.connect(
         host = cfg.mysql_host,
@@ -20,16 +25,7 @@ def mysql_login():
         database = cfg.mysql_db,
         port = cfg.mysql_port
     )
-    return cnx.cursor()
-
-
-
-def bind_id(qq_id, aime):
-    # 防止注入
-    if not aime.isdigit():
-        return "AimeID错误"
-    # 绑定用户
-    cursor = mysql_login()
+    cursor = cnx.cursor()
     cursor.execute(f"SELECT id FROM sega_card where ext_id='{aime}'")
     card_save = cursor.fetchall()
     cursor.execute(f"SELECT aimeid FROM qq_card where qqid='{qq_id}'")
@@ -65,9 +61,18 @@ def bind_id(qq_id, aime):
             return "已经绑定了AimeID"
 
 
-def do_pr(qq_id):
+def get_ongeki_pr(qq_id):
     # 最近一次的游玩记录
-    cursor = mysql_login()
+    # 连接数据库 
+    _log.info(f"[SELECT] 正在查询最近游玩记录")
+    cnx = mysql.connector.connect(
+        host = cfg.mysql_host,
+        user = cfg.mysql_user,
+        password = cfg.mysql_pwd,
+        database = cfg.mysql_db,
+        port = cfg.mysql_port
+    )
+    cursor = cnx.cursor()
     cursor.execute(f"SELECT aimeid FROM qq_card where qqid='{qq_id}'")
     AimeID = cursor.fetchall()
     if not AimeID:
@@ -99,28 +104,38 @@ def do_pr(qq_id):
         full_bell = "FB"
     music_id = cur[0][2]
     music_level = cur[0][3]
-    cursor.execute(f"SELECT artist_name, name, {level[music_level]},  FROM ongeki_game_music where id='{music_id}'")
+    cursor.execute(f"SELECT artist_name, name, {level[music_level]} FROM ongeki_game_music where id='{music_id}'")
     music_list = cursor.fetchall()
     cursor.close()
     cnx.close()
     difficulty = float(music_list[0][2].replace(',', '.'))
-    rt_name, rt_score = rating(cur[0][0], difficulty)
+    rt_name, rt_score = get_rating(cur[0][0], difficulty)
     back = f"{music_list[0][0]}  -  {music_list[0][1]}\n" + \
         "—————————————————\n" + \
         f"Difficulty\t\t{level_name[music_level]} | {difficulty}\n" + \
         f"Score(BS)\t\t{cur[0][0]}({cur[0][1]})\n" + \
         f"Rank\t\t{rt_name} | {full_combo}{full_bell} | {rt_score}\n" + \
         "—————————————————\n" + \
-        f"C.BREAK\t{cur[0][8]}\tBREAK\t{cur[0][9]}\n" + \
-        f"HIT\t\t{cur[0][10]}\tMISS\t{cur[0][11]}\n" + \
-        f"BELL\t\t{cur[0][13]}\tCOMBO\t{cur[0][12]}\n" + \
+        f"C.BREAK\t{str(cur[0][8]).ljust(6,' ')}\tBREAK\t{str(cur[0][9]).ljust(6,' ')}\n" + \
+        f"HIT\t\t{str(cur[0][10]).ljust(6,' ')}\tMISS\t{str(cur[0][11]).ljust(6,' ')}\n" + \
+        f"BELLt\t{str(cur[0][13]).ljust(6,' ')}\tCOMBO\t{str(cur[0][12]).ljust(6,' ')}\n" + \
         "—————————————————\n" + \
         f"{cur[0][4].split('.')[0]}\n"
+    _log.info(f"[SELECT] 最近游玩记录查询完毕")
     return back
 
 def unbind_id(qq_id):
     # 解绑用户
-    cursor = mysql_login()
+    # 连接数据库
+    _log.info(f"\t[SELECT] 执行解绑aimeID")
+    cnx = mysql.connector.connect(
+        host = cfg.mysql_host,
+        user = cfg.mysql_user,
+        password = cfg.mysql_pwd,
+        database = cfg.mysql_db,
+        port = cfg.mysql_port
+    )
+    cursor = cnx.cursor()
     cursor.execute(f"SELECT qqid FROM qq_card where qqid='{qq_id}'")
     card_save = cursor.fetchall()
     if not card_save:
@@ -135,9 +150,18 @@ def unbind_id(qq_id):
     
 
     
-def user_pack(qq_id):
+def get_ongeki_user(qq_id):
     # 查询用户数据
-    cursor = mysql_login()
+    # 连接数据库
+    _log.info(f"[SELECT] 正在查询用户数据")
+    cnx = mysql.connector.connect(
+        host = cfg.mysql_host,
+        user = cfg.mysql_user,
+        password = cfg.mysql_pwd,
+        database = cfg.mysql_db,
+        port = cfg.mysql_port
+    )
+    cursor = cnx.cursor()
     cursor.execute(f"SELECT aimeid FROM qq_card where qqid='{qq_id}'")
     AimeID = cursor.fetchall()
     if not AimeID:
@@ -161,4 +185,65 @@ def user_pack(qq_id):
         f"Battle Point\t{cur[0][5]}\n" + \
         f"Last Play\t\t{cur[0][6].split()[0]}\n" + \
         "———————————————"
+    _log.info(f"[SELECT] 用户数据查询完毕")
+    return back
+
+def get_ongeki_b30(qq_id):
+    # 获取b30数据
+    # 连接数据库
+    _log.info(f"[SELECT] 正在生成b30数据")
+    cnx = mysql.connector.connect(
+        host = cfg.mysql_host,
+        user = cfg.mysql_user,
+        password = cfg.mysql_pwd,
+        database = cfg.mysql_db,
+        port = cfg.mysql_port
+    )
+    cursor = cnx.cursor()
+    cursor.execute(f"SELECT aimeid FROM qq_card where qqid='{qq_id}'")
+    AimeID = cursor.fetchall()
+    if not AimeID:
+        cursor.close()
+        cnx.close()
+        return "未绑定AimeID"
+    AimeID = AimeID[0][0]
+    _log.info(f"[SELECT] (0/3)正在查询数据")
+    cursor.execute(f"SELECT id FROM sega_card where ext_id='{AimeID}'")
+    user = cursor.fetchall()
+    user = user[0][0]
+    cursor.execute(f"SELECT id FROM ongeki_user_data where aime_card_id='{user}'")
+    user_id = cursor.fetchall()                             
+    user_id = user_id[0][0]
+    cursor.execute(f"SELECT tech_score_max, music_id, level FROM ongeki_user_music_detail where user_id='{user_id}'")
+    cur = cursor.fetchall()
+    _log.info(f"[SELECT] (1/3)必要数据计算中")
+    Songlist = []
+    for cur_f in cur:
+        music_level = cur_f[2]
+        cursor.execute(f"SELECT name, {level[music_level]} FROM ongeki_game_music where id='{cur_f[1]}'")
+        music_list = cursor.fetchall()
+        difficulty = float(music_list[0][1].replace(',', '.'))
+        name = f"{music_list[0][0]}[{level_name[music_level]}]"
+        rating = get_rating(cur_f[0], difficulty)
+        Songlist.append([name, rating[0]])
+    cursor.close()
+    cnx.close()
+    _log.info(f"[SELECT] (2/3)数据正在打包")
+    out_b30 = []
+    for num, (name, rating) in enumerate(Songlist, start=0):
+        if num < 30:
+            out_b30.append([name, rating])
+            out_b30 = sorted(out_b30, key=lambda x: x[1])
+        else:
+            if rating > out_b30[0][1]:
+                del out_b30[0]
+                out_b30.append([name, rating])
+                out_b30 = sorted(out_b30, key=lambda x: x[1])
+    _log.info(f"[SELECT] (3/3)打包完成，正在输出")
+    back = "———————————————————————————————\nBEST 30\nBP—Rating—Song———————————————————————\n"
+    for for_round, (name, rating) in enumerate(out_b30[::-1], start=1):
+        inc = f"{for_round}\t{str(rating).ljust(6,' ')}\t{name}\n"
+        back = back + inc
+    back = back + "———————————————————————————————\nb45的开发受阻了，数据仅供参考并不可信"
+    _log.info(f"[SELECT] b30数据生成完毕")
     return back

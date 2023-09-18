@@ -10,7 +10,9 @@ from matplotlib.font_manager import FontProperties
 from .tools import *
 
 from parse import npdb
-from utli.logger import timber
+
+from botpy import logging
+_log = logging.get_logger()
 
 
 def plot_single(sg_index: int, _music_map: list, profile: list) -> str:
@@ -315,12 +317,12 @@ def plot_single(sg_index: int, _music_map: list, profile: list) -> str:
         output_path = '%s/pr.png' % (cfg.output)
         cv2.imwrite(output_path, bg[:1560, :540, :3], params=[cv2.IMWRITE_PNG_COMPRESSION, 3])
 
-        timber.info('Plot saved at [%s] successfully.' % output_path)
+        _log.info('Plot saved at [%s] successfully.' % output_path)
 
         return
 
     except Exception:
-        timber.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
+        _log.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
                        % format_exc())
         return
 
@@ -495,11 +497,11 @@ def plot_b50(_music_map: list, profile: list) -> str:
         # an attempt to alleviate memory use
         del bg, music_map, music_b50
 
-        timber.info('Plot saved at [%s] successfully.' % output_path)
+        _log.info('Plot saved at [%s] successfully.' % output_path)
         return
 
     except Exception:
-        timber.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
+        _log.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
                        % format_exc())
         return
 
@@ -531,7 +533,7 @@ def plot_level(level: int, limits: tuple, grade_flag: str = None,
         msg.append('\n|%-5d|%-9s|%-6s|%-6s|%-6.3f |%s' %
                    (index + 1, score, clear_table[clear], grade_table[grade], vf, npdb.level_table[mid][1]))
     msg = ''.join(msg)
-    timber.debug('Generate level.%d scores complete.\n%s' % (level, msg))
+    _log.debug('Generate level.%d scores complete.\n%s' % (level, msg))
 
     try:
         music_map = deepcopy(_music_map)
@@ -695,12 +697,12 @@ def plot_level(level: int, limits: tuple, grade_flag: str = None,
         png_superimpose(bg, text_layer)
         output_path = '%s/%s_LEVEL%d@%d-%d.png' % (cfg.output, validate_filename(user_name), level, lim_l, lim_h)
         cv2.imwrite(output_path, bg[:, :, :3], params=[cv2.IMWRITE_PNG_COMPRESSION, 3])
-        timber.info('Plot saved at [%s] successfully.' % output_path)
+        _log.info('Plot saved at [%s] successfully.' % output_path)
 
         return msg
 
     except Exception:
-        timber.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
+        _log.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
                        % format_exc())
         return msg
 
@@ -771,7 +773,7 @@ def plot_summary(base_lv: int, _music_map: list, profile: list):
         aaa, aaa_plus, s, _sum = level_summary[index][14:]
         msg.append('\n| lv.%-6d%-8d%-8d%-8d%-8d| %-8d%-8d%-8d| %-8d' % (index, nc, hc, uc, puc, aaa, aaa_plus, s, _sum))
     msg = ''.join(msg)
-    timber.debug('Generate summary data complete.\n%s' % msg)
+    _log.debug('Generate summary data complete.\n%s' % msg)
 
     # Generate data frame for joint plot
     vf_list, vf_size, low_score, low_lv, high_lv = [], 100, 10000000, 20, 0  # Just [score: int, vf: float, lv: str]
@@ -1237,10 +1239,10 @@ def plot_summary(base_lv: int, _music_map: list, profile: list):
         except FileNotFoundError:
             pass
 
-        timber.info('Plot saved at [%s] successfully.' % output_path)
+        _log.info('Plot saved at [%s] successfully.' % output_path)
         return msg
 
     except Exception:
-        timber.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
+        _log.warning('Something wrong happens in the plot function, only will the text message be returned.\n%s'
                        % format_exc())
         return msg

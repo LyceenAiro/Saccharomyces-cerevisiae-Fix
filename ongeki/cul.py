@@ -1,7 +1,7 @@
 import math
 
 
-def rating(score, level):
+def get_rating(score, level):
     if score >= 1007500:
         rating = level + 2
         rank = "SSS+"

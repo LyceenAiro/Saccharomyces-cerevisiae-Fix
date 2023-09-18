@@ -84,3 +84,5 @@ Werkzeug==2.3.6
 wsproto==1.2.0
 yarl==1.9.2
 zipp==3.6.0
+mysql-connector-python==8.1.0
+protobuf==4.21.12

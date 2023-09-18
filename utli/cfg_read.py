@@ -4,10 +4,12 @@ import sys
 
 from xml.etree.cElementTree import parse
 
-from .logger import timber
 from .dir import local_dir
 
 from update import update
+
+from botpy import logging
+_log = logging.get_logger()
 
 
 # Read config.cfg
@@ -18,7 +20,7 @@ class Config:
         self.path = local_dir + '/config.cfg'
         if not path.exists(self.path):
             self._create()
-            timber.error('config.cfg not found, the program will try to generate a new one.\n')
+            _log.error('config.cfg not found, the program will try to generate a new one.\n')
             input('Press enter to continue.')
             sys.exit(1)
 
@@ -32,10 +34,10 @@ class Config:
             __key, __value = data_path
             if not path.exists(__value):
                 if __key == 'output path':
-                    timber.warning('output path not found, the program will try to make one.')
+                    _log.warning('output path not found, the program will try to make one.')
                     mkdir(__value)
                 else:
-                    timber.error('%s not found, please check your file directory.' % __key)
+                    _log.error('%s not found, please check your file directory.' % __key)
                     sys.exit(1)
 
         # update check (from version date code)
@@ -100,7 +102,7 @@ class Config:
             'user = user\n'
             'password = pwd\n'
             'database = aqua\n'
-            'port = port\n'
+            'port = 3389\n'
 
         )
         _cfg.close()
@@ -125,10 +127,7 @@ class Config:
         mysql_port = self.cfg.get('Mysql', 'port')
 
 
-        timber.info('config.cfg load complete.\n'
-                    'map size  :%d\ndb dir    :%s\ngame dir  :%s\noutput    :%s\n'
-                    'skin name :%s\nlanguage  :%s\nis init   :%s\nversion   :%d'
-                    % (map_size, db_dir, game_dir, output, skin_name, language, str(is_init), version))
+        _log.info('config.cfg load complete.')
 
         return map_size, db_dir, game_dir, output, skin_name, language, is_init, version, appid, token, mysql_host, mysql_user, mysql_pwd, mysql_db, mysql_port
 
