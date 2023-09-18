@@ -101,7 +101,7 @@ class ASPParser:
                         self._crew_index = json_dict['param'][24]
 
         if not self.last_index:
-            _log.error('Music record not found, make sure you have at least played once (and saved successfully).')
+            _log.error('\t[Login] Music record not found, make sure you have at least played once (and saved successfully).')
 
         self.akaname = 'よろしくお願いします'  # Default akaname
         try:
@@ -110,21 +110,19 @@ class ASPParser:
             except KeyError:
                 self.crew_id = '0014'  # Gen 6 Rasis
 
-            _log.info('Profile data load successfully.\n'
-                        'user name   :%s\nappeal card :%d\nakaname     :%s\nskill       :%d\ncrew        :%s' %
-                        (self.user_name, self.ap_card, self.akaname, self.skill, self.crew_id))
+            _log.info('\t[Login] Profile data load successfully.')
         except AttributeError:
-            _log.error('Profile/Skill/Crew data not found, '
+            _log.error('\t[Login] Profile/Skill/Crew data not found, '
                          'make sure you have at least played once (and saved successfully).')
 
-        _log.info('Asphyxia database parse complete.')
+        _log.info('\t[Login] Asphyxia database parse complete.')
 
     def get_akaname(self):
         """Update the akaname through npdb.aka_db, can be removed if necessary"""
         for akaname in aka_db:
             if int(akaname[0]) == self.aka_index:
                 self.akaname = akaname[1]
-                _log.info('Update akaname data to %s' % self.akaname)
+                _log.info('\t[Login] Update akaname data to %s' % self.akaname)
                 break
 
     def get_lv_vf(self, lv_i: int = 8, vf_i: int = 9):
@@ -135,7 +133,7 @@ class ASPParser:
         :param vf_i: index of volforce
         """
         if self.music_map[self.last_index][lv_i] or self.music_map[self.last_index][vf_i]:
-            _log.error('Designed index has been occupied, try another index.')
+            _log.error('\t[Login] Designed index has been occupied, try another index.')
             sys.exit(1)
         for index in range(len(self.music_map)):
             valid, mid, m_type, score, clear, grade, m_time, exs = self.music_map[index][:8]

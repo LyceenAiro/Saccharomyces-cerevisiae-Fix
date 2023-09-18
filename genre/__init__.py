@@ -1,3 +1,3 @@
-from genre import gen5, gen6
+from genre import gen6
 
-packet = {'gen5': gen5, 'gen6': gen6}
+packet = {'gen6': gen6}

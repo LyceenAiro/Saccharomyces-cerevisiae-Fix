@@ -35,10 +35,12 @@ class MyClient(botpy.Client):
             await asyncio.wait_for(self.on_at_message_do(message), timeout=30)
         except asyncio.TimeoutError:
             # 处理超时逻辑
+            _log.info(f"[Return] 上传文件时超时")
             await message.reply(content="上传文件时超时")
 
     async def on_at_message_do(self, message: Message):
         userID = message.author.id
+        _log.info(f"[Return] 用户[{userID}]操作了bot")
         with open("data/card_db.txt", "r") as file:
             lines = file.readlines()
             updated_lines = [line for line in lines if userID not in line.split(":")[0]]
@@ -46,12 +48,14 @@ class MyClient(botpy.Client):
         if message.content.split()[1].startswith("/"):
             # 在线查询
             if "/ping" == message.content.split()[1]:
+                _log.info(f"[Return] Ping!!!")
                 await message.reply(content=f"{self.robot.name}收到你的消息了")
             
             # sdvx查询
             elif "/sdvx" == message.content.split()[1]:
                 # 查询最近游玩歌曲的最佳成绩
                 if "pr" == message.content.split()[2]:
+                    _log.info(f"[SDVX] 查询最近游玩曲目")
                     if len(lines) == len(updated_lines):
                         await message.reply(content="该账号还未绑定KonamiID")
                         return
@@ -61,6 +65,7 @@ class MyClient(botpy.Client):
 
                 # 查询best50
                 elif "b50" == message.content.split()[2]:
+                    _log.info(f"[SDVX] 查询最佳50首曲目")
                     if len(lines) == len(updated_lines):
                         await message.reply(content="该账号还未绑定KonamiID")
                         return
@@ -70,7 +75,20 @@ class MyClient(botpy.Client):
                 
                 # 查询点灯信息
                 elif "sm" == message.content.split()[2]:
-                    await message.reply(content="该功能正在开发中")
+                    _log.info(f"[SDVX] 查询点灯信息")
+                    if len(lines) == len(updated_lines):
+                        await message.reply(content="该账号还未绑定KonamiID")
+                        return
+                    try:
+                        level = int(message.content.split()[3])
+                    except:
+                        await message.reply(content="请指定查询等级")
+                    if level <= 20 and level >= 1:
+                        asp = self.user_login(userID)
+                        self.plot_skin.plot_summary(base_lv=level, _music_map=asp.music_map, profile=asp.profile)
+                        await message.reply(file_image=f"{cfg.output}/SMplus.png")
+                    else:
+                        await message.reply(content="查询等级错误，等级应该在1~20之间")
                 else:
                     return
 
@@ -78,6 +96,7 @@ class MyClient(botpy.Client):
             elif "/konami" == message.content.split()[1]:
                 # 绑定B系账户
                 if "bind" == message.content.split()[2]:
+                    _log.info(f"[Konami] 尝试绑定账户")
                     try:
                         cardID = message.content.split()[3]
                         if len(cardID) != 16:
@@ -98,6 +117,7 @@ class MyClient(botpy.Client):
 
                 # 取消绑定B系账户
                 elif "unbind" == message.content.split()[2]:
+                    _log.info(f"[Konami] 尝试解绑用户")
                     if len(lines) == len(updated_lines):
                         await message.reply(content="该账号还未绑定ID")
                         return
@@ -154,6 +174,7 @@ class MyClient(botpy.Client):
                         "————————————————\n"
                         "声明：该bot代码开源且完全免费！！！\n"
                         "GitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
+                _log.info(f"[Return] 帮助页面")
                 await message.reply(content=helpmsg)
 
             else:
