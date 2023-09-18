@@ -4,6 +4,7 @@
 - 正在开发ongeki的查分模块
 - 更多指令分区
 - 非指令动作
+- SDVX查分器新功能恢复
 ## 分支变更-version1.4.0 [qqbot分支]
 - 整合最新的requirements，支持python3.11
 - 代码修复大部分UI问题
