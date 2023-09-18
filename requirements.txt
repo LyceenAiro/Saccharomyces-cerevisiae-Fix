@@ -9,7 +9,7 @@ APScheduler==3.10.4
 async-timeout==3.0.1
 attrs==23.1.0
 blinker==1.5
-certifi==2022.12.7
+certifi==2023.7.22
 chardet==4.0.0
 charset-normalizer==3.1.0
 click==8.1.3
