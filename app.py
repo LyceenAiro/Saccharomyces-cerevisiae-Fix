@@ -183,6 +183,8 @@ class MyClient(botpy.Client):
         # 非指令动作
         elif "摸摸" in message.content.split()[1]:
             await message.reply(content="嘿嘿~好舒服uwu")
+        elif "最近怎么样" in message.content.split()[1]:
+            await message.reply(content="还在想~")
         else:
             await message.reply(content="嗷呜~")
 
