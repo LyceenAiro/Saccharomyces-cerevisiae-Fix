@@ -4,7 +4,7 @@ import shutil
 import ifstools
 
 from .common import decode_b64
-from .data import gen5, gen6
+from .data import gen6
 
 from utli.dir import local_dir
 
@@ -47,7 +47,7 @@ def update_img(game_dir, skin_name):
     if not path.exists(genre_path):
         makedirs(genre_path)
 
-    dependency_dict = {'gen5': gen5.dependency, 'gen6': gen6.dependency}
+    dependency_dict = {'gen6': gen6.dependency}
 
     dependency = dependency_dict[skin_name].dependency
 

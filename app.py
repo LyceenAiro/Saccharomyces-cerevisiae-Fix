@@ -219,7 +219,7 @@ class MyClient(botpy.Client):
             cursor.close()
             cnx.close()
         except:
-            print("[Error]\taqua数据库连接失败，如果这是你第一次连接数据库，请重启直至连接成功")
+            _log.error("[Error]\taqua数据库连接失败，如果这是你第一次连接数据库，请重启直至连接成功")
     
     def user_login(self, userID):
         # Konami用户数据获取

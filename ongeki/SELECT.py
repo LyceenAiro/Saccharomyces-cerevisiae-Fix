@@ -17,7 +17,6 @@ def bind_id(qq_id, aime):
     _log.info(f"\t[SELECT] 执行绑定aimeID")
     if not aime.isdigit():
         return "AimeID错误"
-    # 连接数据库
     cnx = mysql.connector.connect(
         host = cfg.mysql_host,
         user = cfg.mysql_user,
@@ -63,7 +62,6 @@ def bind_id(qq_id, aime):
 
 def get_ongeki_pr(qq_id):
     # 最近一次的游玩记录
-    # 连接数据库 
     _log.info(f"[SELECT] 正在查询最近游玩记录")
     cnx = mysql.connector.connect(
         host = cfg.mysql_host,
@@ -126,7 +124,6 @@ def get_ongeki_pr(qq_id):
 
 def unbind_id(qq_id):
     # 解绑用户
-    # 连接数据库
     _log.info(f"\t[SELECT] 执行解绑aimeID")
     cnx = mysql.connector.connect(
         host = cfg.mysql_host,
@@ -152,7 +149,6 @@ def unbind_id(qq_id):
     
 def get_ongeki_user(qq_id):
     # 查询用户数据
-    # 连接数据库
     _log.info(f"[SELECT] 正在查询用户数据")
     cnx = mysql.connector.connect(
         host = cfg.mysql_host,
@@ -190,7 +186,6 @@ def get_ongeki_user(qq_id):
 
 def get_ongeki_b30(qq_id):
     # 获取b30数据
-    # 连接数据库
     _log.info(f"[SELECT] 正在生成b30数据")
     cnx = mysql.connector.connect(
         host = cfg.mysql_host,
@@ -220,7 +215,7 @@ def get_ongeki_b30(qq_id):
     Songlist = []
     for cur_f in cur:
         music_level = cur_f[2]
-        cursor.execute(f"SELECT name, {level[music_level]} FROM ongeki_game_music where id='{cur_f[1]}'")
+        cursor.execute(f"SELECT name, {level[music_level]} FROM ongeki_game_music where id='{cur_f[1]}'")  # 这一个参数肯定会导致程序缓慢，需要将其转移到循环外部
         music_list = cursor.fetchall()
         difficulty = float(music_list[0][1].replace(',', '.'))
         name = f"{music_list[0][0]}[{level_name[music_level]}]"
