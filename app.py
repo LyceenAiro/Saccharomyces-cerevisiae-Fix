@@ -20,7 +20,7 @@ from botpy.message import Message
 from ongeki.SELECT import *
 import mysql.connector
 
-VERSION = [1, 4, 1]
+VERSION = [1, 4, 2]
 
 
 class MyClient(botpy.Client):
