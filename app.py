@@ -164,7 +164,7 @@ class MyClient(botpy.Client):
                     "GitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
                 if len(message.content.split()) > 2:
                     if "2" == message.content.split()[2]:
-                        helpmsg = ("指令帮助[2-ongeki]\\n"
+                        helpmsg = ("指令帮助[2-ongeki]\n"
                         "/aime bind [ID]\t绑定AimeID\n"
                         "/aime unbind\t\t解绑AimeID\n"
                         "/ongeki user\t\t展示用户信息\n"
