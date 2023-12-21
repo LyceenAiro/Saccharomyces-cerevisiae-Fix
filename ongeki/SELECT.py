@@ -1,5 +1,4 @@
 import mysql.connector
-import math
 from utli.cfg_read import cfg
 
 from .cul import *

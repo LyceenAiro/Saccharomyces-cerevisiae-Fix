@@ -5,7 +5,6 @@ from botpy import logging
 _log = logging.get_logger()
 
 from utli import sheet
-from utli.cfg_read import cfg
 
 from .npdb import level_table, aka_db
 
@@ -147,7 +146,7 @@ class ASPParser:
             vf = int(lv * 20 * (score / 10000000) * sheet.clear_factor[clear] * sheet.grade_factor[grade]) / 20
             wvf = (vf * 10000 + lv) * 100000000 + score
             self.music_map[index][lv_i], self.music_map[index][vf_i], self.music_map[index][wvf_i] = lv, vf, wvf
-            
+
     @property
     def profile(self):
         return [self.user_name, self.ap_card, self.akaname, self.skill, self.crew_id]

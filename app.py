@@ -1,7 +1,5 @@
 # non-local packages
 import os
-import sys
-# from traceback import format_exc
 
 # interior packages
 from utli.cfg_read import cfg
