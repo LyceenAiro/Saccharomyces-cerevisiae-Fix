@@ -340,7 +340,7 @@ def plot_b50(_music_map: list, profile: list) -> str:
     """
     # Unpack profile data & sort music records
     music_map = deepcopy(_music_map)
-    music_map.sort(key=lambda x: x[9], reverse=True)
+    music_map.sort(key=lambda x: x[10], reverse=True)
     music_b50 = music_map[:50]
     vol_force = get_overall_vf(music_b50)  # Get overall volforce
 
@@ -470,7 +470,7 @@ def plot_b50(_music_map: list, profile: list) -> str:
         res_vf_field = Anchor(bg, 'respective vf field', free=(53, 488), father=box_anc)  # res = respective
         res_vf_text_anc = AnchorText(bg, 'res vf text', 'VF   #%02d' % (index + 1),
                                         pen, vf_str_font, (0, 1), res_vf_field)
-        res_vf_num_anc = AnchorText(bg, 'res vf num', '%.3f' % vf, pen, vf_num_font, (20, -5), res_vf_field)
+        res_vf_num_anc = AnchorText(bg, 'res vf num', '%.2f' % vf, pen, vf_num_font, (20, -5), res_vf_field)
 
         res_vf_text_anc.plot(color_black)
         res_vf_num_anc.plot(get_vf_level(vf, is_darker=True, is_color=True))
