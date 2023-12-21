@@ -13,8 +13,8 @@ level_name = {0: "BASIC", 1: "ADVANCED", 2: "EXPERT", 3: "MASTER", 10: "LUNATIC"
 
 def bind_id(qq_id, aime):
     # 绑定用户
-    # 防止注入
     _log.info(f"\t[SELECT] 执行绑定aimeID")
+    # 防止注入及检查格式
     if not aime.isdigit():
         return "AimeID错误"
     cnx = mysql.connector.connect(

@@ -7,8 +7,12 @@ import sys
 from utli.cfg_read import cfg
 
 # exterior packages
-from parse.asp import ASPParser
-from genre import packet
+if cfg.sdvx_service == "Ready":
+    from parse.asp import ASPParser
+    from genre import packet
+else:
+    ASPParser = None
+    packet = None
 
 # qqbot
 import botpy,asyncio
@@ -25,7 +29,8 @@ VERSION = [1, 4, 2]
 
 class MyClient(botpy.Client):
     async def on_ready(self):
-        self.load_skin()
+        if cfg.sdvx_service == "Ready":
+            self.load_skin()
         self.initSQL()
         # 初始化bot
         _log.info(f"\t[botpy]「{self.robot.name}」 准备完毕！")
@@ -53,6 +58,9 @@ class MyClient(botpy.Client):
             
             # sdvx查询
             elif "/sdvx" == message.content.split()[1]:
+                if cfg.sdvx_service == "Down":
+                    await message.reply(content="sdvx服务未开启")
+                    return
                 # 查询最近游玩歌曲的最佳成绩
                 if "pr" == message.content.split()[2]:
                     _log.info(f"[SDVX] 查询最近游玩曲目")
@@ -129,7 +137,10 @@ class MyClient(botpy.Client):
             
             # aimeID
             elif "/aime" == message.content.split()[1]:
-               # 绑定aimeID
+                if self.aqua_service == "Down":
+                    await message.reply(content="aqua服务未开启")
+                    return
+                # 绑定aimeID
                 if "bind" == message.content.split()[2]:
                     await message.reply(content=bind_id(userID, message.content.split()[3]))
                 elif "unbind" == message.content.split()[2]:
@@ -139,6 +150,9 @@ class MyClient(botpy.Client):
 
             # 音击
             elif "/ongeki" == message.content.split()[1]:
+                if self.aqua_service == "Down":
+                    await message.reply(content="aqua服务未开启")
+                    return
                 # 获取用户信息
                 if "user" == message.content.split()[2]:
                     await message.reply(content=get_ongeki_user(userID))
@@ -158,10 +172,7 @@ class MyClient(botpy.Client):
                     "/sdvx sm\t\t\t17+点灯信息\n"
                     "/konami bind [ID]\t绑定ID\n"
                     "/konami unbind\t解绑ID\n"
-                    "/help [page]\t\t帮助\n"
-                    "————————————————\n"
-                    "声明：该bot代码开源且完全免费！！！\n"
-                    "GitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
+                    "/help [page]\t\t帮助")
                 if len(message.content.split()) > 2:
                     if "2" == message.content.split()[2]:
                         helpmsg = ("指令帮助[2-ongeki]\n"
@@ -170,10 +181,16 @@ class MyClient(botpy.Client):
                         "/ongeki user\t\t展示用户信息\n"
                         "/ongeki pr\t\t查询最近一次游玩信息\n"
                         "/ongeki b30\t\t查询最好的30首成绩(beta)\n"
-                        "/help [page]\t\t帮助\n"
-                        "————————————————\n"
-                        "声明：该bot代码开源且完全免费！！！\n"
-                        "GitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
+                        "/help [page]\t\t帮助"
+                        )
+                    if "3" == message.content.split()[2]:
+                        helpmsg = ("指令帮助[3-询问互动]\n"
+                        "直接叫我\n"
+                        "服务状态\n"
+                        "软件声明\n"
+                        "最近怎么样\n"
+                        "摸摸我"
+                        )
                 _log.info(f"[Return] 帮助页面")
                 await message.reply(content=helpmsg)
 
@@ -181,6 +198,14 @@ class MyClient(botpy.Client):
                 await message.reply(content="暂时还没有这个指令嗷嗷嗷")
 
         # 非指令动作
+        elif "服务状态" in message.content.split()[1]:
+            servermsg = ("服务状态\n"
+            f"sdvx状态  - {cfg.sdvx_service}\n"
+            f"aqua状态  - {self.aqua_service}\n"        
+            )
+            await message.reply(content=servermsg)
+        elif "软件声明" in message.content.split()[1]:
+            await message.reply(content="声明：该bot代码开源且完全免费！！！\nGitHub\nLyceenAiro/Saccharomyces-cerevisiae-Fix")
         elif "摸摸" in message.content.split()[1]:
             await message.reply(content="嘿嘿~好舒服uwu")
         elif "最近怎么样" in message.content.split()[1]:
@@ -194,7 +219,7 @@ class MyClient(botpy.Client):
             self.plot_skin = packet[cfg.skin_name].main
         except KeyError:
             _log.error('没有查询到你选择的皮肤包，请重新在配置文件中选择.')
-            sys.exit(1)
+            cfg.sdvx_service = "Down"
     
     def initSQL(self):
         try:
@@ -218,8 +243,10 @@ class MyClient(botpy.Client):
                 cursor.execute(create_table_query)
             cursor.close()
             cnx.close()
+            self.aqua_service = "Ready"
         except:
-            _log.error("[Error]\taqua数据库连接失败，如果这是你第一次连接数据库，请重启直至连接成功")
+            self.aqua_service = "Down"
+            _log.error("[Error]\taqua数据库连接失败")
     
     def user_login(self, userID):
         # Konami用户数据获取
@@ -240,6 +267,8 @@ if __name__ == '__main__':
         with open("data/card_db.txt", "a") as file:
             file.write("1:1\n")
     intents = botpy.Intents(public_guild_messages=True)
-    client = MyClient(intents=intents)
-    client.run(appid=cfg.appid, token=cfg.token)
-    
+    client = MyClient(intents=intents, bot_log=True)
+    try:
+        client.run(appid=cfg.appid, token=cfg.token)
+    except botpy.errors.ServerError as error:
+        _log.error(error)

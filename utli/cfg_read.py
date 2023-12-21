@@ -17,6 +17,7 @@ class Config:
 
     def __init__(self):
         self.cfg = ConfigParser()
+        self.sdvx_service = "Ready"
         self.path = local_dir + '/config.cfg'
         if not path.exists(self.path):
             self._create()
@@ -38,22 +39,26 @@ class Config:
                     mkdir(__value)
                 else:
                     _log.error('%s not found, please check your file directory.' % __key)
-                    sys.exit(1)
 
-        # update check (from version date code)
-        ea3_path = '/'.join(self.game_dir.split('/')[:-1]) + '/prop/ea3-config.xml'
-        tree = parse(ea3_path)
-        root = tree.getroot()
-        cur_ver = int(root[1][4].text)
+        try:
+            # update check (from version date code)
+            ea3_path = '/'.join(self.game_dir.split('/')[:-1]) + '/prop/ea3-config.xml'
+            tree = parse(ea3_path)
+            root = tree.getroot()
+            cur_ver = int(root[1][4].text)
 
-        # update (if necessary)
-        if not self.is_init:
-            update.update(self)
-            self._set_init_sign()
-            self._set_version(cur_ver)
-        elif cur_ver > self.version:
-            update.update(self, game_only=True)
-            self._set_version(cur_ver)
+            # update (if necessary)
+            if not self.is_init:
+                update.update(self)
+                self._set_init_sign()
+                self._set_version(cur_ver)
+            elif cur_ver > self.version:
+                update.update(self, game_only=True)
+                self._set_version(cur_ver)
+
+        except FileNotFoundError:
+            pass
+            self.sdvx_service = "Down"
 
     def _create(self):
         _cfg = open(self.path, 'w', encoding='utf-8')
@@ -73,7 +78,7 @@ class Config:
             'game path = \n'
             '\n'
             '# Directory where outputs pictures\n'
-            'output path = \n'
+            'output path = output\n'
             '\n'
             '\n'
             '[Plot]\n'
@@ -126,6 +131,8 @@ class Config:
         mysql_db = self.cfg.get('Mysql', 'database')
         mysql_port = self.cfg.get('Mysql', 'port')
 
+        if appid == "" or token == "":
+            _log.error('appid or token cannot be empty.')
 
         _log.info('config.cfg load complete.')
 
