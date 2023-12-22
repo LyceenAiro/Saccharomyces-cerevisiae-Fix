@@ -38,8 +38,11 @@ class MyClient(botpy.Client):
             await asyncio.wait_for(self.on_at_message_do(message), timeout=30)
         except asyncio.TimeoutError:
             # 处理超时逻辑
-            _log.info(f"[Return] 上传文件时超时")
+            _log.error(f"[Return] 上传文件时超时")
             await message.reply(content="上传文件时超时")
+        except Exception as error:
+            _log.error(error)
+            await message.reply(content=error)
 
     async def on_at_message_do(self, message: Message):
         userID = message.author.id
@@ -88,13 +91,13 @@ class MyClient(botpy.Client):
                     try:
                         level = int(message.content.split()[3])
                     except:
-                        await message.reply(content="请指定查询等级")
+                        await message.reply(content="请指定查询难度")
                     if level <= 20 and level >= 1:
                         asp = self.user_login(userID)
                         self.plot_skin.plot_summary(base_lv=level, _music_map=asp.music_map, profile=asp.profile)
                         await message.reply(file_image=f"{cfg.output}/SMplus.png")
                     else:
-                        await message.reply(content="查询等级错误，等级应该在1~20之间")
+                        await message.reply(content="查询难度错误，难度应该在1~20之间")
                 else:
                     return
 
@@ -243,8 +246,9 @@ class MyClient(botpy.Client):
             cnx.close()
             self.aqua_service = "Ready"
         except:
+            _log.error("[Error]\taqua数据库连接失败，服务已关闭")
             self.aqua_service = "Down"
-            _log.error("[Error]\taqua数据库连接失败")
+
     
     def user_login(self, userID):
         # Konami用户数据获取

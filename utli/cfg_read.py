@@ -56,8 +56,8 @@ class Config:
                 update.update(self, game_only=True)
                 self._set_version(cur_ver)
 
-        except FileNotFoundError:
-            pass
+        except Exception as error:
+            _log.error("加载prop失败，sdvx服务已关闭")
             self.sdvx_service = "Down"
 
     def _create(self):
@@ -93,7 +93,7 @@ class Config:
             '# If you want to update manually, set the value to "False" or "0"\n'
             'is initialized = False\n'
             '\n'
-            '# Current game version in ea3-config, you can leave it as "00000000", it will be filled automatically.\n'
+            '# Current game version in ea3-config, you can leave it as "0000000000", it will be filled automatically.\n'
             'version = 0000000000\n'
             '\n'
             '\n'
