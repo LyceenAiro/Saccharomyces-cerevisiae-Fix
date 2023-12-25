@@ -45,7 +45,7 @@ openpyxl==3.1.2
 packaging==23.1
 pandas==2.0.3
 pefile==2023.2.7
-Pillow==10.0.1
+Pillow==9.5
 pipenv==2023.3.20
 platformdirs==3.2.0
 priority==2.0.0

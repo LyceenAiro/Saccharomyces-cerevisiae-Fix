@@ -4,7 +4,6 @@ import pandas as pd
 import seaborn as sns
 from os import remove
 from traceback import format_exc
-from matplotlib.ticker import MaxNLocator
 from matplotlib.font_manager import FontProperties
 
 from .tools import *
