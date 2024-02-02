@@ -16,4 +16,5 @@ botpy.*
 /webData
 /data
 /*.log
+/check_app.ini
 ~*

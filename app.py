@@ -3,6 +3,7 @@ import os
 
 # interior packages
 from utli.cfg_read import cfg
+from utli.tools import check_app_service_all
 
 # exterior packages
 if cfg.sdvx_service == "Ready":
@@ -22,7 +23,7 @@ from botpy.message import Message
 from ongeki.SELECT import *
 import mysql.connector
 
-VERSION = [1, 4, 2]
+VERSION = [1, 4, 3]
 
 
 class MyClient(botpy.Client):
@@ -187,6 +188,7 @@ class MyClient(botpy.Client):
                     if "3" == message.content.split()[2]:
                         helpmsg = ("指令帮助[3-询问互动]\n"
                         "直接叫我\n"
+                        "程序状态\n"
                         "服务状态\n"
                         "软件声明\n"
                         "最近怎么样\n"
@@ -199,6 +201,8 @@ class MyClient(botpy.Client):
                 await message.reply(content="暂时还没有这个指令嗷嗷嗷")
 
         # 非指令动作
+        elif "程序状态" in message.content.split()[1]:
+            await message.reply(content=check_app_service_all())
         elif "服务状态" in message.content.split()[1]:
             servermsg = ("服务状态\n"
             f"sdvx状态  - {cfg.sdvx_service}\n"
@@ -266,8 +270,11 @@ class MyClient(botpy.Client):
 
 if __name__ == '__main__':
     if not os.path.exists("data/card_db.txt"):
-        with open("data/card_db.txt", "a") as file:
+        with open("data/card_db.txt", "a", encoding='utf-8') as file:
             file.write("1:1\n")
+    if not os.path.exists("check_app.ini"):
+        with open("check_app.ini", "a", encoding='utf-8') as file:
+            file.write("noapp|默认\n")
     intents = botpy.Intents(public_guild_messages=True)
     client = MyClient(intents=intents, bot_log=True)
     try:
