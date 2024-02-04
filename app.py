@@ -228,7 +228,7 @@ class MyClient(botpy.Client):
         else:
             await message.reply(content="嗷呜~")
 
-    async def load_skin(self):
+    def load_skin(self):
         # 初始化skin
         try:
             self.plot_skin = packet[cfg.skin_name].main
@@ -264,7 +264,7 @@ class MyClient(botpy.Client):
             self.aqua_service = "Down"
 
     
-    async def user_login(self, userID):
+    def user_login(self, userID):
         # Konami用户数据获取
         with open("data/card_db.txt", "r") as file:
             for line in file:
