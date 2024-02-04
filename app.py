@@ -18,7 +18,6 @@ import botpy,asyncio
 from botpy import logging
 _log = logging.get_logger()
 from botpy.message import Message
-from aiohttp.client_exceptions import ClientConnectorError
 
 # mysql
 from ongeki.SELECT import *
@@ -212,7 +211,8 @@ class MyClient(botpy.Client):
         elif "服务状态" in message.content.split()[1]:
             servermsg = ("服务状态\n"
             f"sdvx状态  - {cfg.sdvx_service}\n"
-            f"aqua状态  - {self.aqua_service}\n"        
+            f"aqua状态  - {self.aqua_service}\n"
+            f"v{VERSION[0]}.{VERSION[1]}.{VERSION[2]}@2024"
             )
             await message.reply(content=servermsg)
         elif "软件声明" in message.content.split()[1]:
@@ -232,7 +232,7 @@ class MyClient(botpy.Client):
             _log.error('没有查询到你选择的皮肤包，请重新在配置文件中选择.')
             cfg.sdvx_service = "Down"
     
-    async def initSQL(self):
+    def initSQL(self):
         try:
             cnx = mysql.connector.connect(
                 host = cfg.mysql_host,
