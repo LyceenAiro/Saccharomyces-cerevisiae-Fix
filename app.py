@@ -280,5 +280,5 @@ class MyClient(botpy.Client):
 
 if __name__ == '__main__':
     intents = botpy.Intents(public_guild_messages=True)
-    client = MyClient(intents=intents, bot_log=True)        
+    client = MyClient(intents=intents, bot_log=True)
     client.run(appid=cfg.appid, token=cfg.token)
