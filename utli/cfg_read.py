@@ -27,7 +27,9 @@ class Config:
 
         self.map_size, self.db_dir, self.game_dir, self.output, self.skin_name,\
         self.language, self.is_init, self.version, self.appid, self.token,\
-        self.mysql_host, self.mysql_user, self.mysql_pwd, self.mysql_db, self.mysql_port= self._read()
+        self.mysql_host, self.mysql_user, self.mysql_pwd, self.mysql_db,\
+        self.mysql_port, self.int_interface, self.int_send, self.int_recv,\
+        self.int_check_time = self._read()
 
         # validity check for paths
         path_list = self.cfg.items('Directory')
@@ -110,7 +112,13 @@ class Config:
             'password = pwd\n'
             'database = aqua\n'
             'port = 3389\n'
-
+            '\n'
+            '\n'
+            '[Io]\n'
+            'interface = \n'
+            'max send = 10\n' 
+            'max recv = 10\n'
+            'check time = 3\n'
         )
         _cfg.close()
 
@@ -132,13 +140,19 @@ class Config:
         mysql_pwd = self.cfg.get('Mysql', 'password')
         mysql_db = self.cfg.get('Mysql', 'database')
         mysql_port = self.cfg.get('Mysql', 'port')
+        int_interface = self.cfg.get('Io', 'interface')
+        int_send = self.cfg.getint('Io', 'max send')
+        int_recv = self.cfg.getint('Io', 'max recv')
+        int_check_time = self.cfg.getint('Io', 'check time')
 
         if appid == "" or token == "":
             _log.error('appid or token cannot be empty.')
 
         _log.info('config.cfg load complete.')
 
-        return map_size, db_dir, game_dir, output, skin_name, language, is_init, version, appid, token, mysql_host, mysql_user, mysql_pwd, mysql_db, mysql_port
+        return map_size, db_dir, game_dir, output, skin_name, language, is_init,\
+            version, appid, token, mysql_host, mysql_user, mysql_pwd, mysql_db,\
+            mysql_port, int_interface, int_send, int_recv, int_check_time
 
     def _set_init_sign(self, set_bool: bool = True):
         self.cfg.set('Init', 'is initialized', str(set_bool))

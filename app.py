@@ -3,7 +3,7 @@ import os
 
 # interior packages
 from utli.cfg_read import cfg
-from utli.tools import check_app_service_all
+from utli.tools import *
 
 # exterior packages
 if cfg.sdvx_service == "Ready":
@@ -18,6 +18,7 @@ import botpy,asyncio
 from botpy import logging
 _log = logging.get_logger()
 from botpy.message import Message
+from aiohttp.client_exceptions import ClientConnectorError
 
 # mysql
 from ongeki.SELECT import *
@@ -30,8 +31,10 @@ class MyClient(botpy.Client):
     async def on_ready(self):
         if cfg.sdvx_service == "Ready":
             self.load_skin()
+        if not os.path.exists("data/card_db.txt"):
+            with open("data/card_db.txt", "a", encoding='utf-8') as file:
+                file.write("1:1\n")
         self.initSQL()
-        # 初始化bot
         _log.info(f"\t[botpy]「{self.robot.name}」 准备完毕！")
     
     async def on_at_message_create(self, message: Message):
@@ -203,6 +206,8 @@ class MyClient(botpy.Client):
         # 非指令动作
         elif "程序状态" in message.content.split()[1]:
             await message.reply(content=check_app_service_all())
+        elif "硬件状态" in message.content.split()[1]:
+            await message.reply(content=check_pc())
         elif "服务状态" in message.content.split()[1]:
             servermsg = ("服务状态\n"
             f"sdvx状态  - {cfg.sdvx_service}\n"
@@ -269,15 +274,6 @@ class MyClient(botpy.Client):
 
 
 if __name__ == '__main__':
-    if not os.path.exists("data/card_db.txt"):
-        with open("data/card_db.txt", "a", encoding='utf-8') as file:
-            file.write("1:1\n")
-    if not os.path.exists("check_app.ini"):
-        with open("check_app.ini", "a", encoding='utf-8') as file:
-            file.write("noapp|默认\n")
     intents = botpy.Intents(public_guild_messages=True)
-    client = MyClient(intents=intents, bot_log=True)
-    try:
-        client.run(appid=cfg.appid, token=cfg.token)
-    except botpy.errors.ServerError as error:
-        _log.error(error)
+    client = MyClient(intents=intents, bot_log=True)        
+    client.run(appid=cfg.appid, token=cfg.token)
