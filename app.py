@@ -192,6 +192,7 @@ class MyClient(botpy.Client):
                         helpmsg = ("指令帮助[3-询问互动]\n"
                         "直接叫我\n"
                         "程序状态\n"
+                        "硬件状态\n"
                         "服务状态\n"
                         "软件声明\n"
                         "最近怎么样\n"
@@ -223,7 +224,7 @@ class MyClient(botpy.Client):
         else:
             await message.reply(content="嗷呜~")
 
-    def load_skin(self):
+    async def load_skin(self):
         # 初始化skin
         try:
             self.plot_skin = packet[cfg.skin_name].main
@@ -231,7 +232,7 @@ class MyClient(botpy.Client):
             _log.error('没有查询到你选择的皮肤包，请重新在配置文件中选择.')
             cfg.sdvx_service = "Down"
     
-    def initSQL(self):
+    async def initSQL(self):
         try:
             cnx = mysql.connector.connect(
                 host = cfg.mysql_host,
@@ -259,7 +260,7 @@ class MyClient(botpy.Client):
             self.aqua_service = "Down"
 
     
-    def user_login(self, userID):
+    async def user_login(self, userID):
         # Konami用户数据获取
         with open("data/card_db.txt", "r") as file:
             for line in file:
