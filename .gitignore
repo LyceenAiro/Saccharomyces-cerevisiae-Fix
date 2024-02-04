@@ -17,4 +17,5 @@ botpy.*
 /data
 /*.log
 /check_app.ini
+/echo.txt
 ~*

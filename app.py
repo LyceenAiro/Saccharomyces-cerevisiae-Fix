@@ -220,7 +220,11 @@ class MyClient(botpy.Client):
         elif "摸摸" in message.content.split()[1]:
             await message.reply(content="嘿嘿~好舒服uwu")
         elif "最近怎么样" in message.content.split()[1]:
-            await message.reply(content="还在想~")
+            if not os.path.exists("echo.txt"):
+                with open("echo.txt", "a", encoding='utf-8') as file:
+                    file.write("还在想~")
+            with open('echo.txt', 'r', encoding='utf-8') as file:
+                await message.reply(content=file.read())
         else:
             await message.reply(content="嗷呜~")
 
