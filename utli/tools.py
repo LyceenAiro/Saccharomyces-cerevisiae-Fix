@@ -15,10 +15,12 @@ _log = logging.get_logger()
 
 def check_app_service(app_name):
     try:
+        total_memory = 0
         for proc in psutil.process_iter(['pid', 'name']):
             if proc.info['name'] == app_name:
                 process = psutil.Process(proc.info['pid'])
-                return [True, process.memory_info().rss]
+                total_memory += process.memory_info().rss
+                return [True, total_memory]
     except Exception as error:
         _log.error(error)
     return [False, None]
