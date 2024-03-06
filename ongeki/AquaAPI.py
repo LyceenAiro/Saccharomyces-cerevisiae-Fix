@@ -19,6 +19,7 @@ def api_payload(api_name, aimeID):
 def get_ongeki_pr(qq_id):
     # 最近一次的游玩记录
     _log.info(f"[ongeki] 正在查询最近游玩记录")
+    start = time()
     AimeID = get_AimeID(qq_id)
     if AimeID == None:
         return "未绑定AimeID"
@@ -46,7 +47,7 @@ def get_ongeki_pr(qq_id):
         f"BELL\t{str(result[0]['bellCount']):<10}COMBO\t{str(result[0]['maxCombo']):<6}\n" + \
         "—————————————————\n" + \
         f"{str(result[0]['userPlayDate']).split('.')[0]}\n"
-    _log.info(f"[ongeki] 最近游玩记录查询完毕")
+    _log.info(f"[ongeki] 最近游玩记录查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
     
 
@@ -54,6 +55,7 @@ def get_ongeki_pr(qq_id):
 def get_ongeki_user(qq_id):
     # 查询用户数据
     _log.info(f"[ongeki] 正在查询用户数据")
+    start = time()
     AimeID = get_AimeID(qq_id)
     if AimeID == None:
         return "未绑定AimeID"
@@ -68,7 +70,7 @@ def get_ongeki_user(qq_id):
         f"Battle Point\t{result['battlePoint']}\n" + \
         f"Last Play\t{last_play}\n" + \
         "———————————————"
-    _log.info(f"[ongeki] 用户数据查询完毕")
+    _log.info(f"[ongeki] 用户数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
 
 def get_ongeki_bp(qq_id):
@@ -120,6 +122,5 @@ def get_ongeki_bp(qq_id):
         music_list = music_list[0]
         rt_score, rt_name = get_rating(data[2], float(music_list[2].replace(',', '.')))
         back += f"{round:<4}{music_list[1]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
-    back += f"\n查询用时: {(time() - start):.2f} 秒"
-    _log.info(f"[SELECT] b45数据查询完毕")
+    _log.info(f"[SELECT] bp数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
