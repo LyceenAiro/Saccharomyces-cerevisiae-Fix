@@ -1,3 +1,7 @@
+# 注意，这里是过时的代码，将不再使用该代码作为查询功能
+# 现查询功能已移至AquaAPI.py
+# 现数据库相关功能已移至sql.py
+
 import mysql.connector
 from utli.cfg_read import cfg
 

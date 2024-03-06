@@ -19,11 +19,12 @@ from botpy import logging
 _log = logging.get_logger()
 from botpy.message import Message
 
-# mysql
-from ongeki.SELECT import *
+# mysql & AquaAPI
+from ongeki.AquaAPI import *
+from ongeki.sql import *
 import mysql.connector
 
-VERSION = [1, 4, 3]
+VERSION = [1, 4, 4]
 
 
 class MyClient(botpy.Client):
@@ -163,7 +164,7 @@ class MyClient(botpy.Client):
                 elif "pr" == message.content.split()[2]:
                     await message.reply(content=get_ongeki_pr(userID))
                 elif "b30" == message.content.split()[2]:
-                    await message.reply(content=get_ongeki_b30(userID))
+                    await message.reply(content=get_ongeki_bp(userID))
                 else:
                     return
 

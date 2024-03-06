@@ -28,8 +28,8 @@ class Config:
         self.map_size, self.db_dir, self.game_dir, self.output, self.skin_name,\
         self.language, self.is_init, self.version, self.appid, self.token,\
         self.mysql_host, self.mysql_user, self.mysql_pwd, self.mysql_db,\
-        self.mysql_port, self.int_interface, self.int_send, self.int_recv,\
-        self.int_check_time = self._read()
+        self.mysql_port, self.aqua_api, self.int_interface, self.int_send,\
+        self.int_recv, self.int_check_time = self._read()
 
         # validity check for paths
         path_list = self.cfg.items('Directory')
@@ -106,12 +106,17 @@ class Config:
             '\n'
             '\n'
             '[Mysql]\n'
-            '# If you want to search ongeki score with aqua must use Mysql.\n'
+            '# If you want to search score with aqua must use Mysql.\n'
             'host = localhost\n'
             'user = user\n'
             'password = pwd\n'
             'database = aqua\n'
             'port = 3389\n'
+            '\n'
+            '\n'
+            '[AquaAPI]'
+            '# If you want to search score with aqua must connect api and band you aimeID.'
+            'api url = http://127.0.0.1/api/'
             '\n'
             '\n'
             '[Io]\n'
@@ -140,6 +145,7 @@ class Config:
         mysql_pwd = self.cfg.get('Mysql', 'password')
         mysql_db = self.cfg.get('Mysql', 'database')
         mysql_port = self.cfg.get('Mysql', 'port')
+        aqua_api = self.cfg.get('AquaAPI', 'api url')
         int_interface = self.cfg.get('Io', 'interface')
         int_send = self.cfg.getint('Io', 'max send')
         int_recv = self.cfg.getint('Io', 'max recv')
@@ -152,7 +158,7 @@ class Config:
 
         return map_size, db_dir, game_dir, output, skin_name, language, is_init,\
             version, appid, token, mysql_host, mysql_user, mysql_pwd, mysql_db,\
-            mysql_port, int_interface, int_send, int_recv, int_check_time
+            mysql_port, aqua_api, int_interface, int_send, int_recv, int_check_time
 
     def _set_init_sign(self, set_bool: bool = True):
         self.cfg.set('Init', 'is initialized', str(set_bool))
