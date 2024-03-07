@@ -4,7 +4,7 @@ from urllib3.exceptions import InsecureRequestWarning
 from utli.cfg_read import cfg
 from ongeki.list import level_name
 from ongeki.cul import get_rating
-from ongeki.sql import get_AimeID, select_music_list
+from ongeki.sql import get_AimeID, select_music_list, select_music_mutlist
 
 from time import time
 from botpy import logging
@@ -87,40 +87,52 @@ def get_ongeki_bp(qq_id):
     payload = f"{AimeID}&key=rating_base_hot_best"
     result_r10 = api_payload("ongeki/general", payload)["propertyValue"].split(",")
 
+    # 获取需要查询的乐曲组
+    get_musiclist = []
+    for data in result_b30:
+        get_data = data.split(":")
+        if get_data == []:
+            break
+        get_musiclist.append(get_data[0])
+    for data in result_b15:
+        get_data = data.split(":")
+        if get_data == []:
+            break
+        get_musiclist.append(get_data[0])
+    for data in result_r10:
+        get_data = data.split(":")
+        if get_data == []:
+            break
+        get_musiclist.append(get_data[0])
+    get_musiclist = list(set(get_musiclist))
+    music_list = select_music_mutlist(get_musiclist)
+
+    # 输出数据组合
     back = "———————————————————————————————\nBEST 30\nBP—Rating—Song———————————————————————\n"
-    _log.info(f"[ongeki] 正在查询b30数据")
     for round, data in enumerate(result_b30, start=1):
         data = data.split(":")
-        data[1], data[2] = int(data[1]), int(data[2])
-        music_list = select_music_list(data[0], data[1])
-        if music_list == []:
+        if data[0] == "0":
             break
-        music_list = music_list[0]
-        rt_score, rt_name = get_rating(data[2], float(music_list[2].replace(',', '.')))
-        back += f"{round:<4}{music_list[1]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
+        data[1], data[2] = int(data[1]), int(data[2])
+        rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
+        back += f"{round:<4}{music_list[data[0]][0]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
         
     back += "———————————————————————————————\nNew BEST 15\nBP—Rating—Song———————————————————————\n"
-    _log.info(f"[ongeki] 正在查询b15数据")
     for round, data in enumerate(result_b15, start=1):
         data = data.split(":")
-        data[1], data[2] = int(data[1]), int(data[2])
-        music_list = select_music_list(data[0], data[1])
-        if music_list == []:
+        if data[0] == "0":
             break
-        music_list = music_list[0]
-        rt_score, rt_name = get_rating(data[2], float(music_list[2].replace(',', '.')))
-        back += f"{round:<4}{music_list[1]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
+        data[1], data[2] = int(data[1]), int(data[2])
+        rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
+        back += f"{round:<4}{music_list[data[0]][0]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
 
     back += "———————————————————————————————\nRecent 10\nBP—Rating—Song———————————————————————\n"
-    _log.info(f"[ongeki] 正在查询r10数据")
     for round, data in enumerate(result_r10, start=1):
         data = data.split(":")
-        data[1], data[2] = int(data[1]), int(data[2])
-        music_list = select_music_list(data[0], data[1])
-        if music_list == []:
+        if data[0] == "0":
             break
-        music_list = music_list[0]
-        rt_score, rt_name = get_rating(data[2], float(music_list[2].replace(',', '.')))
-        back += f"{round:<4}{music_list[1]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
-    _log.info(f"[SELECT] bp数据查询完毕，耗时 {(time() - start):.2f} 秒")
+        data[1], data[2] = int(data[1]), int(data[2])
+        rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
+        back += f"{round:<4}{music_list[data[0]][0]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
+    _log.info(f"[ongeki] bp数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
