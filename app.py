@@ -163,7 +163,7 @@ class MyClient(botpy.Client):
                     await message.reply(content=get_ongeki_user(userID))
                 elif "pr" == message.content.split()[2]:
                     await message.reply(content=get_ongeki_pr(userID))
-                elif "b30" == message.content.split()[2]:
+                elif "bp" == message.content.split()[2]:
                     await message.reply(content=get_ongeki_bp(userID))
                 else:
                     return
@@ -185,7 +185,7 @@ class MyClient(botpy.Client):
                         "/aime unbind\t\t解绑AimeID\n"
                         "/ongeki user\t\t展示用户信息\n"
                         "/ongeki pr\t\t查询最近一次游玩信息\n"
-                        "/ongeki b30\t\t查询最好的30首成绩(beta)\n"
+                        "/ongeki bp\t\t查询BP成绩组\n"
                         "/help [page]\t\t帮助"
                         )
                     if "3" == message.content.split()[2]:

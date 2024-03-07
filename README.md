@@ -1,8 +1,9 @@
 # 修复和升级
 ## 更多更新关注Releases页面
 - 在doc.md中查询指令帮助
-- 支持SDVX
-- 支持aqua for mysql
+- 支持SDVX成绩查询
+- 支持aqua for ongeki
+- 支持aqua for chusan
 ## 功能添加-version1.4.1
 - 接入基于aqua的mysql数据库
 - 正在开发ongeki的查分模块
