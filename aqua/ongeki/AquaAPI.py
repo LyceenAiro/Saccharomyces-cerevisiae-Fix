@@ -115,7 +115,7 @@ def get_ongeki_bp(qq_id):
             break
         data[1], data[2] = int(data[1]), int(data[2])
         rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
-        back += f"{round:<4}{music_list[data[0]][0]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
+        back += f"{round:<4}{rt_score:<6}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
         
     back += "———————————————————————————————\nNew BEST 15\nBP—Rating—Song———————————————————————\n"
     for round, data in enumerate(result_b15, start=1):
@@ -124,7 +124,7 @@ def get_ongeki_bp(qq_id):
             break
         data[1], data[2] = int(data[1]), int(data[2])
         rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
-        back += f"{round:<4}{music_list[data[0]][0]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
+        back += f"{round:<4}{rt_score:<6}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
 
     back += "———————————————————————————————\nRecent 10\nBP—Rating—Song———————————————————————\n"
     for round, data in enumerate(result_r10, start=1):
@@ -133,6 +133,6 @@ def get_ongeki_bp(qq_id):
             break
         data[1], data[2] = int(data[1]), int(data[2])
         rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
-        back += f"{round:<4}{music_list[data[0]][0]:<30}\t{level_name[data[1]]}\t{rt_score}\n"
+        back += f"{round:<4}{rt_score:<7}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
     _log.info(f"[ongeki] bp数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back

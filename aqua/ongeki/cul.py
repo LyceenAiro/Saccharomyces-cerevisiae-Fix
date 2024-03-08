@@ -1,3 +1,4 @@
+# ongeki rating
 import math
 
 

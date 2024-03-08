@@ -20,8 +20,8 @@ _log = logging.get_logger()
 from botpy.message import Message
 
 # mysql & AquaAPI
-from ongeki.AquaAPI import *
-from ongeki.sql import *
+from aqua.ongeki.AquaAPI import *
+from aqua.aime.sql import bind_id, unbind_id
 import mysql.connector
 
 VERSION = [1, 4, 4]
