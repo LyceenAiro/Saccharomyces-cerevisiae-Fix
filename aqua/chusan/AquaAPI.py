@@ -5,7 +5,7 @@ from utli.cfg_read import cfg
 from aqua.chusan.list import level_name
 from aqua.chusan.cul import get_rating
 from aqua.aime.sql import get_AimeID
-from aqua.chusan.sql import get_AimeID, select_music_list, select_music_mutlist
+from aqua.chusan.sql import select_music_list, select_music_mutlist
 
 from time import time
 from botpy import logging
@@ -35,20 +35,20 @@ def get_chusan_pr(qq_id):
         full_combo = "AJ"
     music_level = result[0]["level"]
     music_list = select_music_list(result[0]["musicId"], music_level)
-    difficulty = float(music_list[0][2].replace(',', '.'))
-    rt_score, rt_name = get_rating(result[0]["techScore"], difficulty)
+    difficulty = float(f"{music_list[0][2]}.{music_list[0][3]}")
+    rt_score, rt_name = get_rating(result[0]["score"], difficulty)
     back = f"{music_list[0][0]}  -  {music_list[0][1]}\n" + \
         "—————————————————\n" + \
         f"Difficulty\t{level_name[music_level]} | {difficulty}\n" + \
-        f"Score(BS)\t{result[0]['techScore']}({result[0]['battleScore']})\n" + \
+        f"Score\t\t{result[0]['score']}\n" + \
         f"Rank\t\t{rt_score} | {clear_song}{full_combo} | {rt_name}\n" + \
         "—————————————————\n" + \
         f"C.JUSTICE\t{str(result[0]['judgeCritical'] + result[0]['judgeHeaven']):<10}JUSTICE\t{str(result[0]['judgeJustice']):<6}\n" + \
-        f"ATTACK\t{str(result[0]['judgeAttack']):<10}MISS\t{str(result[0]['judgeGuilty']):<6}\n" + \
-        f"COMBO\t{str(result[0]['maxCombo']):<6}\n" + \
+        f"ATTACK\t\t{str(result[0]['judgeAttack']):<10}MISS\t{str(result[0]['judgeGuilty']):<6}\n" + \
+        f"COMBO\t\t{str(result[0]['maxCombo']):<6}\n" + \
         "—————————————————\n" + \
-        f"{str(result[0]['userPlayDate']).replace("T", " ")}\n"
-    _log.info(f"[ongeki] 最近游玩记录查询完毕，耗时 {(time() - start):.2f} 秒")
+        f"{str(result[0]['userPlayDate']).replace('T', ' ')}\n"
+    _log.info(f"[chusan] 最近游玩记录查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
     
 

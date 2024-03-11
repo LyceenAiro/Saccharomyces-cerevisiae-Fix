@@ -1,7 +1,7 @@
 import mysql.connector
 from utli.cfg_read import cfg
 
-from ongeki.list import *
+from aqua.ongeki.list import *
 
 
 def select_music_list(music_id, music_level):

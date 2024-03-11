@@ -2,9 +2,10 @@ import requests
 from urllib3.exceptions import InsecureRequestWarning
 
 from utli.cfg_read import cfg
-from ongeki.list import level_name
-from ongeki.cul import get_rating
-from ongeki.sql import get_AimeID, select_music_list, select_music_mutlist
+from aqua.ongeki.list import level_name
+from aqua.ongeki.cul import get_rating
+from aqua.ongeki.sql import select_music_list, select_music_mutlist
+from aqua.aime.sql import get_AimeID
 
 from time import time
 from botpy import logging

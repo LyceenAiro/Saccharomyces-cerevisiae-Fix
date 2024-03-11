@@ -2,7 +2,7 @@ import mysql.connector
 from utli.cfg_read import cfg
 
 from botpy import logging
-from ongeki.list import *
+from aqua.ongeki.list import *
 _log = logging.get_logger()
 
 
