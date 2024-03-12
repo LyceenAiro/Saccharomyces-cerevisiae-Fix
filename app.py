@@ -259,7 +259,7 @@ class MyClient(botpy.Client):
         try:
             self.plot_skin = packet[cfg.skin_name].main
         except KeyError:
-            _log.error('没有查询到你选择的皮肤包，请重新在配置文件中选择.')
+            _log.error('[Error] 没有查询到你选择的皮肤包，请重新在配置文件中选择.')
             cfg.sdvx_service = "Down"
     
     def initSQL(self):
@@ -286,7 +286,7 @@ class MyClient(botpy.Client):
             cnx.close()
             self.aqua_service = "Ready"
         except:
-            _log.error("[Error]\taqua服务连接失败，服务已关闭")
+            _log.error("[Error] aqua服务连接失败，服务已关闭")
             self.aqua_service = "Down"
 
     
