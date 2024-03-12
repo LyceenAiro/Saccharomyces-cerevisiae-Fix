@@ -3,7 +3,7 @@ import os
 
 # interior packages
 from utli.cfg_read import cfg
-from utli.tools import *
+from utli.tools import check_app_service_all, check_pc
 
 # exterior packages
 if cfg.sdvx_service == "Ready":
@@ -20,8 +20,8 @@ _log = logging.get_logger()
 from botpy.message import Message
 
 # mysql & AquaAPI
-from aqua.ongeki.AquaAPI import *
-from aqua.chusan.AquaAPI import *
+from aqua.ongeki.AquaAPI import get_ongeki_bp, get_ongeki_pr, get_ongeki_user
+from aqua.chusan.AquaAPI import get_chusan_bp, get_chusan_pr, get_chusan_user
 from aqua.aime.sql import bind_id, unbind_id
 import mysql.connector
 
