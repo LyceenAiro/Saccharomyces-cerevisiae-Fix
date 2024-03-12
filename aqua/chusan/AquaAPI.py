@@ -53,25 +53,24 @@ def get_chusan_pr(qq_id):
     
 
     
-def get_ongeki_user(qq_id):
+def get_chusan_user(qq_id):
     # 查询用户数据
-    _log.info(f"[ongeki] 正在查询用户数据")
+    _log.info(f"[chusan] 正在查询用户数据")
     start = time()
     AimeID = get_AimeID(qq_id)
     if AimeID == None:
         return "未绑定AimeID"
-    result = api_payload("ongeki/profile", AimeID)
-    last_play = str(api_payload("ongeki/recent", AimeID)["content"][0]["userPlayDate"]).split('.')[0]
+    result = api_payload("chuni/v2/profile", AimeID)
+    last_play = str(result["lastPlayDate"]).replace('T', ' ')
     back = "———————————————\n" + \
         f"Aime ID\t\t{AimeID}\n" + \
         f"Name\t\t{result['userName']}\n" + \
         f"Play Count\t{result['playCount']}\n" + \
         f"Level\t\tlv.{result['level']}\n" + \
         f"Rating\t\t{int(result['playerRating'])/100}(Max {int(result['highestRating'])/100})\n" + \
-        f"Battle Point\t{result['battlePoint']}\n" + \
         f"Last Play\t{last_play}\n" + \
         "———————————————"
-    _log.info(f"[ongeki] 用户数据查询完毕，耗时 {(time() - start):.2f} 秒")
+    _log.info(f"[chusan] 用户数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
 
 def get_ongeki_bp(qq_id):
