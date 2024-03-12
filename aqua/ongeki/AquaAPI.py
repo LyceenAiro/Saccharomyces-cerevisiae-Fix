@@ -39,13 +39,13 @@ def get_ongeki_pr(qq_id):
     rt_score, rt_name = get_rating(result[0]["techScore"], difficulty)
     back = f"{music_list[0][0]}  -  {music_list[0][1]}\n" + \
         "—————————————————\n" + \
-        f"Difficulty\t{level_name[music_level]} | {difficulty}\n" + \
-        f"Score(BS)\t{result[0]['techScore']}({result[0]['battleScore']})\n" + \
+        f"Difficulty\t\t{level_name[music_level]} | {difficulty}\n" + \
+        f"Score(BS)\t\t{result[0]['techScore']}({result[0]['battleScore']})\n" + \
         f"Rank\t\t{rt_score} | {full_combo}{full_bell} | {rt_name}\n" + \
         "—————————————————\n" + \
         f"C.BREAK\t{str(result[0]['judgeCriticalBreak']):<10}BREAK\t{str(result[0]['judgeBreak']):<6}\n" + \
-        f"HIT\t{str(result[0]['judgeHit']):<10}MISS\t{str(result[0]['judgeMiss']):<6}\n" + \
-        f"BELL\t{str(result[0]['bellCount']):<10}COMBO\t{str(result[0]['maxCombo']):<6}\n" + \
+        f"HIT\t\t{str(result[0]['judgeHit']):<10}MISS\t{str(result[0]['judgeMiss']):<6}\n" + \
+        f"BELL\t\t{str(result[0]['bellCount']):<10}COMBO\t{str(result[0]['maxCombo']):<6}\n" + \
         "—————————————————\n" + \
         f"{str(result[0]['userPlayDate']).split('.')[0]}\n"
     _log.info(f"[ongeki] 最近游玩记录查询完毕，耗时 {(time() - start):.2f} 秒")
@@ -69,7 +69,7 @@ def get_ongeki_user(qq_id):
         f"Level\t\tlv.{result['level']}\n" + \
         f"Rating\t\t{int(result['playerRating'])/100}(Max {int(result['highestRating'])/100})\n" + \
         f"Battle Point\t{result['battlePoint']}\n" + \
-        f"Last Play\t{last_play}\n" + \
+        f"Last Play\t\t{last_play}\n" + \
         "———————————————"
     _log.info(f"[ongeki] 用户数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
@@ -116,7 +116,7 @@ def get_ongeki_bp(qq_id):
             break
         data[1], data[2] = int(data[1]), int(data[2])
         rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
-        back += f"{round:<4}{rt_score:<6}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
+        back += f"{round:<6}{rt_score:<8}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
         
     back += "———————————————————————————————\nNew BEST 15\nBP—Rating—Song———————————————————————\n"
     for round, data in enumerate(result_b15, start=1):
@@ -125,7 +125,7 @@ def get_ongeki_bp(qq_id):
             break
         data[1], data[2] = int(data[1]), int(data[2])
         rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
-        back += f"{round:<4}{rt_score:<6}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
+        back += f"{round:<6}{rt_score:<8}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
 
     back += "———————————————————————————————\nRecent 10\nBP—Rating—Song———————————————————————\n"
     for round, data in enumerate(result_r10, start=1):
@@ -134,6 +134,6 @@ def get_ongeki_bp(qq_id):
             break
         data[1], data[2] = int(data[1]), int(data[2])
         rt_score, rt_name = get_rating(data[2], float(music_list[data[0]][1][data[1]].replace(',', '.')))
-        back += f"{round:<4}{rt_score:<7}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
+        back += f"{round:<6}{rt_score:<8}{music_list[data[0]][0]} [{level_name[data[1]]}]\n"
     _log.info(f"[ongeki] bp数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back

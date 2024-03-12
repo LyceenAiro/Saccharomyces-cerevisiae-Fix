@@ -21,6 +21,7 @@ from botpy.message import Message
 
 # mysql & AquaAPI
 from aqua.ongeki.AquaAPI import *
+from aqua.chusan.AquaAPI import *
 from aqua.aime.sql import bind_id, unbind_id
 import mysql.connector
 
@@ -167,6 +168,21 @@ class MyClient(botpy.Client):
                     await message.reply(content=get_ongeki_bp(userID))
                 else:
                     return
+            
+            # 中二节奏
+            elif "/chuni" == message.content.split()[1]:
+                if self.aqua_service == "Down":
+                    await message.reply(content="aqua服务未开启")
+                    return
+                # 获取用户信息
+                if "user" == message.content.split()[2]:
+                    await message.reply(content=get_chusan_user(userID))
+                elif "pr" == message.content.split()[2]:
+                    await message.reply(content=get_chusan_pr(userID))
+                elif "bp" == message.content.split()[2]:
+                    await message.reply(content=get_chusan_bp(userID))
+                else:
+                    return
 
             # 帮助页面
             elif "/help" == message.content.split()[1]:
@@ -189,7 +205,16 @@ class MyClient(botpy.Client):
                         "/help [page]\t\t帮助"
                         )
                     if "3" == message.content.split()[2]:
-                        helpmsg = ("指令帮助[3-询问互动]\n"
+                        helpmsg = ("指令帮助[3-chusan]\n"
+                        "/aime bind [ID]\t绑定AimeID\n"
+                        "/aime unbind\t\t解绑AimeID\n"
+                        "/chuni user\t\t展示用户信息\n"
+                        "/chuni pr\t\t查询最近一次游玩信息\n"
+                        "/chuni bp\t\t查询BP成绩组\n"
+                        "/help [page]\t\t帮助"
+                        )
+                    if "4" == message.content.split()[2]:
+                        helpmsg = ("指令帮助[4-询问互动]\n"
                         "直接叫我\n"
                         "程序状态\n"
                         "硬件状态\n"
@@ -261,7 +286,7 @@ class MyClient(botpy.Client):
             cnx.close()
             self.aqua_service = "Ready"
         except:
-            _log.error("[Error]\taqua数据库连接失败，服务已关闭")
+            _log.error("[Error]\taqua服务连接失败，服务已关闭")
             self.aqua_service = "Down"
 
     

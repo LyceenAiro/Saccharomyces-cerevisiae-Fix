@@ -5,7 +5,7 @@ from utli.cfg_read import cfg
 from aqua.chusan.list import level_name
 from aqua.chusan.cul import get_rating
 from aqua.aime.sql import get_AimeID
-from aqua.chusan.sql import select_music_list, select_music_mutlist
+from aqua.chusan.sql import select_music_list
 
 from time import time
 from botpy import logging
@@ -39,7 +39,7 @@ def get_chusan_pr(qq_id):
     rt_score, rt_name = get_rating(result[0]["score"], difficulty)
     back = f"{music_list[0][0]}  -  {music_list[0][1]}\n" + \
         "—————————————————\n" + \
-        f"Difficulty\t{level_name[music_level]} | {difficulty}\n" + \
+        f"Difficulty\t\t{level_name[music_level]} | {difficulty}\n" + \
         f"Score\t\t{result[0]['score']}\n" + \
         f"Rank\t\t{rt_score} | {clear_song}{full_combo} | {rt_name}\n" + \
         "—————————————————\n" + \
@@ -50,8 +50,6 @@ def get_chusan_pr(qq_id):
         f"{str(result[0]['userPlayDate']).replace('T', ' ')}\n"
     _log.info(f"[chusan] 最近游玩记录查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
-    
-
     
 def get_chusan_user(qq_id):
     # 查询用户数据
@@ -68,7 +66,7 @@ def get_chusan_user(qq_id):
         f"Play Count\t{result['playCount']}\n" + \
         f"Level\t\tlv.{result['level']}\n" + \
         f"Rating\t\t{int(result['playerRating'])/100}(Max {int(result['highestRating'])/100})\n" + \
-        f"Last Play\t{last_play}\n" + \
+        f"Last Play\t\t{last_play}\n" + \
         "———————————————"
     _log.info(f"[chusan] 用户数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
@@ -82,12 +80,11 @@ def get_chusan_bp(qq_id):
         return "未绑定AimeID"
     result_b15 = api_payload("chuni/v2/rating", AimeID)
     result_r10 = api_payload("chuni/v2/rating/recent", AimeID)
-
     back = "———————————————————————————————\nBEST 15\nBP—Rating—Song———————————————————————\n"
     for round, data in enumerate(result_b15, start=1):
-        back += f"{round:<4}{data['rating']/100:<6}{data['musicName']} [{level_name[data['level']]}]\n"
+        back += f"{round:<6}{data['rating']/100:<8}{data['musicName']} [{level_name[data['level']]}]\n"
     back += "———————————————————————————————\nRecent 10\nBP—Rating—Song———————————————————————\n"
     for round, data in enumerate(result_r10, start=1):
-        back += f"{round:<4}{data['rating']/100:<6}{data['musicName']} [{level_name[data['level']]}]\n"
+        back += f"{round:<6}{data['rating']/100:<8}{data['musicName']} [{level_name[data['level']]}]\n"
     _log.info(f"[chusan] bp数据查询完毕，耗时 {(time() - start):.2f} 秒")
     return back
